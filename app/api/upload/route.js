@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { put } from "@vercel/blob";
 import { currentUser, token } from "@/lib/util";
+import { blobToken } from "@/lib/env";
 
 export const runtime = "nodejs";
 
@@ -17,11 +18,12 @@ export async function POST(req) {
   if (!ext) return Response.json({ error: "Use JPG, PNG, WEBP or PDF" }, { status: 400 });
   const name = `wholesale/${new Date().toISOString().slice(0, 10)}/${token(9)}.${ext}`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(name, file, { access: "public", contentType: file.type });
+  const bt = blobToken();
+  if (bt) {
+    const blob = await put(name, file, { access: "public", contentType: file.type, token: bt });
     return Response.json({ url: blob.url });
   }
-  if (process.env.VERCEL) return Response.json({ error: "Storage isn't connected. Add Vercel Blob to the project." }, { status: 500 });
+  if (process.env.VERCEL) return Response.json({ error: "Photo storage isn't connected. In Vercel, connect the Blob store with "Add a read-write token" ticked, then redeploy." }, { status: 500 });
   // Local development fallback: write into /public/uploads
   const dest = path.join(process.cwd(), "public", "uploads", name.replace(/\//g, "_"));
   await fs.mkdir(path.dirname(dest), { recursive: true });

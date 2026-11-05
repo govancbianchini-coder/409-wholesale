@@ -2,7 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
 
-const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+const env = process.env;
+let url = env.DATABASE_URL || env.POSTGRES_URL;
+if (!url) {
+  const pg = Object.entries(env).filter(([, v]) => typeof v === "string" && /^postgres(ql)?:\/\//.test(v));
+  const score = ([k]) => (/UNPOOLED|NON_POOLING|NO_SSL|PRISMA/.test(k) ? 1 : 0) + (/_URL$/.test(k) ? 0 : 2);
+  pg.sort((a, b) => score(a) - score(b));
+  url = pg[0]?.[1];
+}
 if (!url) {
   console.log("[migrate] No DATABASE_URL set — skipping migration.");
   process.exit(0);
