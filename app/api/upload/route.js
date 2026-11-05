@@ -23,7 +23,7 @@ export async function POST(req) {
     const blob = await put(name, file, { access: "public", contentType: file.type, token: bt });
     return Response.json({ url: blob.url });
   }
-  if (process.env.VERCEL) return Response.json({ error: "Photo storage isn't connected. In Vercel, connect the Blob store with "Add a read-write token" ticked, then redeploy." }, { status: 500 });
+  if (process.env.VERCEL) return Response.json({ error: "Photo storage isn't connected. In Vercel, connect the Blob store with 'Add a read-write token' ticked, then redeploy." }, { status: 500 });
   // Local development fallback: write into /public/uploads
   const dest = path.join(process.cwd(), "public", "uploads", name.replace(/\//g, "_"));
   await fs.mkdir(path.dirname(dest), { recursive: true });
