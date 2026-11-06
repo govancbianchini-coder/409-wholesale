@@ -14,7 +14,7 @@ export default async function Intake() {
     <>
       <header className="topbar">
         <div className="inner">
-          <span className="brand">409 WHOLESALE</span>
+          <span className="brand">OVERBID</span>
           {user?.role === "admin" ? <Link href="/" className="who" style={{ marginLeft: "auto", color: "#c9c5bd" }}>← Dashboard</Link> : <div className="who">{user?.name}<a href="/logout">Sign out</a></div>}
         </div>
       </header>

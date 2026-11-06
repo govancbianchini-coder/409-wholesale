@@ -1,12 +1,12 @@
-export const metadata = { title: "Bid terms · 409 Wholesale" };
+export const metadata = { title: "Bid terms · Overbid" };
 
 export default function Terms() {
   return (
     <>
-      <div className="pub-top"><div className="inner"><span className="brand">409 WHOLESALE</span></div></div>
+      <div className="pub-top"><div className="inner"><span className="brand">OVERBID</span></div></div>
       <div className="prose">
         <h1>Wholesale bid terms</h1>
-        <p className="small">409 Wholesale is a division of 409 Motor Company, 101 Highland Park Common NE, Airdrie, AB T4A 0X3 · 403.808.1801. These terms apply to every bid placed through a 409 Wholesale link.</p>
+        <p className="small">Overbid is a dealer-to-dealer wholesale platform operated by 409 Motor Company, 101 Highland Park Common NE, Airdrie, AB T4A 0X3 · 403.808.1801. These terms apply to every bid placed through a Overbid link.</p>
 
         <h2>1. Who can bid</h2>
         <p>Bidding is open only to licensed automotive dealers and wholesalers that 409 has invited. Each link is personal to the dealer it was sent to. Bids are placed on behalf of that dealership.</p>
@@ -24,10 +24,10 @@ export default function Terms() {
         <p>Payment in full is due within 2 business days of acceptance by wire transfer, bank draft or approved dealer cheque. GST applies. Title passes and the unit is released once funds clear. The buyer picks up from the stated location within 3 business days of payment. After that, storage may be charged.</p>
 
         <h2>6. Failure to complete</h2>
-        <p>A buyer who doesn't complete an accepted bid may be removed from future 409 Wholesale offers.</p>
+        <p>A buyer who doesn't complete an accepted bid may be removed from future Overbid offers.</p>
 
         <h2>7. Messages</h2>
-        <p>You get 409 Wholesale offers by email and/or text because you agreed to. You can opt out any time with the unsubscribe link in any email, by replying STOP to any text, or by calling 403.808.1801.</p>
+        <p>You get Overbid offers by email and/or text because you agreed to. You can opt out any time with the unsubscribe link in any email, by replying STOP to any text, or by calling 403.808.1801.</p>
 
         <p className="xs muted" style={{ marginTop: 28 }}>Last updated: November 2026.</p>
       </div>

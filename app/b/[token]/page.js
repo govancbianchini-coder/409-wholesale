@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }) {
   const { token } = await params;
   const v = await one(`SELECT v.* FROM invitations i JOIN vehicles v ON v.id = i.vehicle_id WHERE i.token = $1`, [token]);
-  return { title: v ? `${title(v)} · 409 Wholesale` : "409 Wholesale" };
+  return { title: v ? `${title(v)} · Overbid` : "Overbid" };
 }
 
 export default async function BidPage({ params, searchParams }) {
@@ -43,7 +43,7 @@ export default async function BidPage({ params, searchParams }) {
 
   return (
     <>
-      <div className="pub-top"><div className="inner"><span className="brand">409 WHOLESALE</span><span className="xs" style={{ color: "#9b968d" }}>{c.dealership}</span></div></div>
+      <div className="pub-top"><div className="inner"><span className="brand">OVERBID</span><span className="xs" style={{ color: "#9b968d" }}>{c.dealership}</span></div></div>
       {user && <div className="notice warn" style={{ borderRadius: 0, textAlign: "center" }}>Preview as {c.first_name} at {c.dealership}. Your views aren't counted.</div>}
       <div className="pub">
         <Gallery photos={photos} />
@@ -83,7 +83,7 @@ export default async function BidPage({ params, searchParams }) {
 
           <p className="xs muted" style={{ marginTop: 18, lineHeight: 1.6 }}>
             Bids are blind. No one sees anyone else's number. You can change your bid until it closes. Questions: 403.808.1801.
-            <br />409 Wholesale, a division of 409 Motor Company · 101 Highland Park Common NE, Airdrie AB · <a href="/terms">Bid terms</a>
+            <br />Overbid, a 409 Motor Company platform · 101 Highland Park Common NE, Airdrie AB · <a href="/terms">Bid terms</a>
           </p>
         </div>
       </div>

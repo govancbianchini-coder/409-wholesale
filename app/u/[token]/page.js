@@ -22,12 +22,12 @@ export default async function Unsub({ params, searchParams }) {
   if (!c) notFound();
   return (
     <div className="center-card">
-      <div className="brand" style={{ textAlign: "center", marginBottom: 18 }}>409 WHOLESALE</div>
+      <div className="brand" style={{ textAlign: "center", marginBottom: 18 }}>OVERBID</div>
       <div className="card"><div className="bd stack">
         {sp?.done && sp.done !== "resub" ? (
           <>
             <h2>You're unsubscribed</h2>
-            <p className="small ink2" style={{ margin: 0 }}>{sp.done === "all" ? "You won't get any more emails or texts from 409 Wholesale." : sp.done === "email" ? "No more emails. Texts are unchanged." : "No more texts. Emails are unchanged."} Changed your mind? Call 403.808.1801.</p>
+            <p className="small ink2" style={{ margin: 0 }}>{sp.done === "all" ? "You won't get any more emails or texts from Overbid." : sp.done === "email" ? "No more emails. Texts are unchanged." : "No more texts. Emails are unchanged."} Changed your mind? Call 403.808.1801.</p>
             {sp.done !== "sms" && <form action={unsubscribe}><input type="hidden" name="token" value={token} /><input type="hidden" name="what" value="resub" /><button className="linkbtn small">Undo, keep sending me emails</button></form>}
           </>
         ) : sp?.done === "resub" ? (
@@ -35,7 +35,7 @@ export default async function Unsub({ params, searchParams }) {
         ) : (
           <>
             <h2>Unsubscribe, {c.first_name}?</h2>
-            <p className="small ink2" style={{ margin: 0 }}>Choose what you'd like to stop receiving from 409 Wholesale.</p>
+            <p className="small ink2" style={{ margin: 0 }}>Choose what you'd like to stop receiving from Overbid.</p>
             <form action={unsubscribe} className="stack-sm">
               <input type="hidden" name="token" value={token} />
               <button className="btn primary block" name="what" value="all">Stop everything</button>

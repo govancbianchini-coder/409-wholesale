@@ -23,8 +23,8 @@ export default async function Login({ searchParams }) {
   return (
     <div className="center-card">
       <div style={{ textAlign: "center", marginBottom: 22 }}>
-        <div className="brand" style={{ fontSize: 15 }}>409 WHOLESALE</div>
-        <div className="muted small" style={{ marginTop: 4 }}>A division of 409 Motor Company</div>
+        <div className="brand" style={{ fontSize: 15 }}>OVERBID</div>
+        <div className="muted small" style={{ marginTop: 4 }}>By 409 Motor Company</div>
       </div>
       <form action={login} className="card">
         <div className="bd stack">

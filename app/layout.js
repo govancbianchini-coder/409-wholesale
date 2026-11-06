@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "409 Wholesale",
+  title: "Overbid",
   description: "Dealer-to-dealer wholesale by 409 Motor Company",
   robots: { index: false, follow: false },
 };

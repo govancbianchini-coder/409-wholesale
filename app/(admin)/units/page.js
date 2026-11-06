@@ -15,7 +15,7 @@ export default async function Units({ searchParams }) {
   return (
     <div className="stack">
       <div className="page-head">
-        <div><h1>Units</h1><p>Every car that's been through 409 Wholesale.</p></div>
+        <div><h1>Units</h1><p>Every car that's been through Overbid.</p></div>
         <Link href="/units/new" className="btn primary">New unit</Link>
       </div>
       <div className="row wrap">

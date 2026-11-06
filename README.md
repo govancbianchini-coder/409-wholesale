@@ -1,6 +1,6 @@
-# 409 Wholesale
+# Overbid (409 Wholesale)
 
-Dealer-to-dealer wholesale brokering for 409 Motor Company. One app, three jobs:
+Overbid — dealer-to-dealer wholesale brokering by 409 Motor Company. Live at overbid.ca. One app, three jobs:
 
 1. **Dealer network** — Kevin adds dealers from his phone (`/intake`), with CASL consent captured on the spot. Admin can search, edit, import/export CSV.
 2. **Units & bids** — create a unit (VIN decode, photos, history report, announcements), pick who gets it, send by email and/or text. Each dealer gets a private link to a mobile bid page. Bids are blind and can be revised until close.
@@ -15,7 +15,7 @@ Stack: Next.js 15 · Postgres · Vercel Blob (photos) · Resend (email) · Twili
 ### 1. Push the code
 ```bash
 cd wholesale
-git init && git add . && git commit -m "409 Wholesale"
+git init && git add . && git commit -m "Overbid"
 ```
 Create a repo on GitHub (e.g. `409-wholesale`) and push it.
 
@@ -39,7 +39,7 @@ Project → **Settings → Environment Variables**:
 | `SESSION_SECRET` | any long random string |
 | `APP_URL` | `https://your-project.vercel.app` (or your custom domain — update it if you add one) |
 | `RESEND_API_KEY` | from resend.com (see below) |
-| `EMAIL_FROM` | `409 Wholesale <wholesale@409motorco.com>` |
+| `EMAIL_FROM` | `Overbid <units@overbid.ca>` |
 | `EMAIL_REPLY_TO` | `govan@409motorco.com` |
 | `TWILIO_ACCOUNT_SID` | from twilio.com console |
 | `TWILIO_AUTH_TOKEN` | from twilio.com console |
