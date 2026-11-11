@@ -119,3 +119,44 @@ CREATE INDEX IF NOT EXISTS messages_created_idx ON messages (created_at DESC);
 -- Market report (comps + stats) attached to a unit, filled by the Overbid Research agent
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS report JSONB;
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS report_at TIMESTAMPTZ;
+
+-- ===== Dealer accounts (Phase 2) =====
+-- A dealership is the org; contacts (existing table) are the people. A contact becomes a dealer user
+-- the first time they sign in by magic link. Preferences live on the dealership.
+CREATE TABLE IF NOT EXISTS dealerships (
+  id            SERIAL PRIMARY KEY,
+  name          TEXT NOT NULL,
+  brand         TEXT,
+  city          TEXT,
+  pref_makes    TEXT[],          -- makes they want to be called on, e.g. {BMW,Audi,Mercedes-Benz}
+  pref_models   TEXT,            -- free text, e.g. "X5, Q7, GLE — SUVs only"
+  pref_min_year INTEGER,
+  pref_max_km   INTEGER,
+  pref_max_price INTEGER,
+  invite_token  TEXT UNIQUE,     -- onboarding link: /d/join/<token>
+  status        TEXT NOT NULL DEFAULT 'active',
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS dealerships_name_uq ON dealerships (lower(name));
+
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS dealership_id INTEGER REFERENCES dealerships(id) ON DELETE SET NULL;
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+
+-- One-time sign-in codes
+CREATE TABLE IF NOT EXISTS login_codes (
+  id          SERIAL PRIMARY KEY,
+  contact_id  INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+  code        TEXT NOT NULL,
+  channel     TEXT NOT NULL,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Units called out by a dealer: who submitted, required photo slots, review state.
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS submitted_by INTEGER REFERENCES contacts(id) ON DELETE SET NULL;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS seller_dealership_id INTEGER REFERENCES dealerships(id) ON DELETE SET NULL;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS dealer_notes TEXT;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS review_note TEXT;
+ALTER TABLE photos ADD COLUMN IF NOT EXISTS slot TEXT;   -- e.g. 'ext_front', 'int_dash'

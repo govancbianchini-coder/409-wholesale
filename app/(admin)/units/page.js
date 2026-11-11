@@ -4,7 +4,7 @@ import { money, km, title, when, effectiveStatus, STATUS_LABEL } from "@/lib/uti
 
 export const dynamic = "force-dynamic";
 
-const FILTERS = [["all", "All"], ["live", "Live"], ["closed", "Awaiting decision"], ["awarded", "Sold"], ["draft", "Drafts"], ["no_sale", "No sale"]];
+const FILTERS = [["all", "All"], ["submitted", "Needs review"], ["live", "Live"], ["closed", "Awaiting decision"], ["awarded", "Sold"], ["draft", "Drafts"], ["no_sale", "No sale"]];
 
 export default async function Units({ searchParams }) {
   const sp = await searchParams;

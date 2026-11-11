@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { put } from "@vercel/blob";
-import { currentUser, token } from "@/lib/util";
+import { currentUser, currentDealer, token } from "@/lib/util";
 import { blobToken } from "@/lib/env";
 
 export const runtime = "nodejs";
@@ -10,7 +10,8 @@ const OK = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "app
 
 export async function POST(req) {
   const user = await currentUser();
-  if (user?.role !== "admin") return Response.json({ error: "Not allowed" }, { status: 401 });
+  const dealer = await currentDealer();
+  if (user?.role !== "admin" && !dealer) return Response.json({ error: "Not allowed" }, { status: 401 });
   const fd = await req.formData();
   const file = fd.get("file");
   if (!file || typeof file === "string") return Response.json({ error: "No file" }, { status: 400 });

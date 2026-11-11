@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { q } from "@/lib/db";
 import { unitRows } from "@/lib/stats";
 import { money, km, title, when, ago, int, effectiveStatus, STATUS_LABEL, appUrl, TZ } from "@/lib/util";
-import { sendInvites, award, manualBid, extendClose, closeNow, setStatus, updateDeal, deleteVehicle } from "@/lib/units";
+import { spreadFor } from "@/lib/util";
+import { sendInvites, award, manualBid, extendClose, closeNow, setStatus, updateDeal, deleteVehicle, reviewCallout } from "@/lib/units";
 import { PhotoManager, SendPanel, AwardPanel, ManualBid } from "@/components/UnitPanels";
 import { emailConfigured, smsConfigured } from "@/lib/messaging";
 import MarketReport from "@/components/MarketReport";
@@ -50,8 +51,10 @@ export default async function Unit({ params, searchParams }) {
        (SELECT count(*) FROM vehicles vv JOIN bids b ON b.id = vv.winning_bid_id WHERE b.contact_id = c.id)::int wins,
        i.sent_at IS NOT NULL AS invited, i.first_viewed_at IS NOT NULL AS viewed
      FROM contacts c LEFT JOIN invitations i ON i.contact_id = c.id AND i.vehicle_id = $1
-     WHERE NOT c.archived ORDER BY c.dealership`,
-    [id, v.make || ""]
+     WHERE NOT c.archived
+       AND ($3::int IS NULL OR (c.dealership_id IS DISTINCT FROM $3 AND lower(coalesce(c.dealership,'')) <> lower(coalesce((SELECT name FROM dealerships WHERE id = $3), ''))))
+     ORDER BY c.dealership`,
+    [id, v.make || "", v.seller_dealership_id || null]
   );
   const ref = v.seller_ask;
   const candidates = cands.map((c) => {
@@ -74,13 +77,30 @@ export default async function Unit({ params, searchParams }) {
 
   const reachableContacts = cands.filter((c) => !c.archived);
   const top = bids[0];
+  const margin = v.submitted_by ? spreadFor(top?.amount || 0) : v.margin_target;
   const winningBid = bids.find((b) => b.id === v.winning_bid_id);
   const spread = v.sell_price != null && v.buy_price != null ? v.sell_price - v.buy_price : null;
   const testMode = !emailConfigured() || !smsConfigured();
 
+  const seller = v.submitted_by ? await q(`SELECT c.first_name, c.last_name, c.phone, c.email, d.name dname FROM contacts c LEFT JOIN dealerships d ON d.id = c.dealership_id WHERE c.id = $1`, [v.submitted_by]) : [];
+  const sellerRow = seller[0];
   return (
     <div className="stack">
       {sp?.new && <div className="notice good">Unit created. Add photos, then send it out.</div>}
+      {v.status === "submitted" && (
+        <div className="card" style={{ borderColor: "#e8cf9a" }}>
+          <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Called out by {sellerRow?.dname || "a dealer"} — needs your review</h2><span className="small ink2">{sellerRow ? `${sellerRow.first_name} ${sellerRow.last_name || ""} · ${sellerRow.phone || sellerRow.email || ""}` : ""}</span></div>
+          <div className="bd stack-sm">
+            {v.dealer_notes && <div className="small"><b>Dealer notes:</b> {v.dealer_notes}</div>}
+            <div className="small ink2">Check the photos and notes, fix anything in Edit, run research if you want comps on the page, then approve. Approving makes it a draft you can send; the seller's own store is excluded from bidding automatically.</div>
+            <div className="row wrap">
+              <form action={reviewCallout}><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="approve" /><button className="btn primary">Approve</button></form>
+              <form action={reviewCallout} className="row"><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="reject" /><input type="text" name="note" placeholder="Reason (the dealer sees this)" style={{ maxWidth: 260 }} /><button className="btn danger">Reject</button></form>
+            </div>
+          </div>
+        </div>
+      )}
+      {v.submitted_by && v.status !== "submitted" && sellerRow && <div className="small ink2">Called out by <b>{sellerRow.dname}</b> ({sellerRow.first_name}). Their store is excluded from bidding. {v.status === "rejected" ? <span className="tag bad">Rejected</span> : null}</div>}
       <div className="page-head">
         <div className="row" style={{ gap: 16, alignItems: "center" }}>
           {v.photo ? <img src={v.photo} className="thumb lg" alt="" /> : null}
@@ -98,7 +118,7 @@ export default async function Unit({ params, searchParams }) {
 
       <div className="grid g4">
         <div className="card stat"><div className="k">Top bid</div><div className="v">{money(top?.amount)}</div><div className="s">{top ? top.dealership : "No bids yet"}</div></div>
-        <div className="card stat"><div className="k">Offer seller</div><div className="v">{top ? money(top.amount - v.margin_target) : "—"}</div><div className="s">top bid − {money(v.margin_target)}{v.seller_ask ? ` · wants ${money(v.seller_ask)}` : ""}</div></div>
+        <div className="card stat"><div className="k">{v.submitted_by ? "Seller's number" : "Offer seller"}</div><div className="v">{top ? money(top.amount - margin) : "—"}</div><div className="s">{v.submitted_by ? `top bid − spread (${top ? money(margin) : "$500 / $1,000 over $50k"})` : `top bid − ${money(v.margin_target)}`}{v.seller_ask ? ` · wants ${money(v.seller_ask)}` : ""}</div></div>
         <div className="card stat"><div className="k">Bids / views / sent</div><div className="v">{v.bid_count} / {v.views} / {v.invites}</div><div className="s">{v.invites ? `${Math.round((v.bid_count / v.invites) * 100)}% bid rate` : "Not sent yet"}</div></div>
         <div className="card stat"><div className="k">{st === "awarded" ? "Spread to 409" : "Closes"}</div><div className="v" style={{ fontSize: st === "awarded" ? 28 : 18, lineHeight: st === "awarded" ? undefined : "34px" }}>{st === "awarded" ? money(spread) : when(v.closes_at)}</div><div className="s">{st === "awarded" ? `sold ${money(v.sell_price)} · paid ${money(v.buy_price)}` : st === "live" ? "Dealers can still bid" : "Bidding closed"}</div></div>
       </div>
@@ -127,7 +147,7 @@ export default async function Unit({ params, searchParams }) {
             </div>
           </div>
 
-          {st !== "awarded" && (
+          {st !== "awarded" && st !== "submitted" && st !== "rejected" && (
             <div className="card">
               <div className="hd"><h2>Send to dealers</h2>{testMode && <span className="tag accent">Test mode{!emailConfigured() ? " · email" : ""}{!smsConfigured() ? " · text" : ""}</span>}</div>
               <div className="bd">
@@ -203,7 +223,7 @@ export default async function Unit({ params, searchParams }) {
           ) : (
             <div className="card">
               <div className="hd"><h2>Award</h2></div>
-              <div className="bd"><AwardPanel action={award} vehicleId={id} bids={bids.map((b) => ({ id: b.id, amount: b.amount, dealership: b.dealership, first_name: b.first_name }))} margin={v.margin_target} sellerAsk={v.seller_ask} /></div>
+              <div className="bd"><AwardPanel action={award} vehicleId={id} bids={bids.map((b) => ({ id: b.id, amount: b.amount, dealership: b.dealership, first_name: b.first_name }))} margin={margin} sellerAsk={v.seller_ask} /></div>
             </div>
           )}
 
@@ -239,7 +259,7 @@ export default async function Unit({ params, searchParams }) {
               <div className="muted">{[v.exterior, v.interior, v.engine, v.drivetrain, v.transmission].filter(Boolean).join(" · ")}</div>
               <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "10px 0" }} />
               <div><b>Seller:</b> {v.seller_name || "—"} {v.seller_source ? `(${v.seller_source})` : ""}</div>
-              <div><b>Seller wants:</b> {money(v.seller_ask)} · <b>Margin target:</b> {money(v.margin_target)}</div>
+              <div><b>Seller wants:</b> {money(v.seller_ask)} · <b>{v.submitted_by ? "Spread" : "Margin target"}:</b> {money(margin)}</div>
               {v.internal_notes && <div><b>Internal:</b> {v.internal_notes}</div>}
             </div>
           </div>

@@ -10,6 +10,7 @@ export default async function Dashboard() {
   const units = await unitRows({ order: "v.closes_at ASC NULLS LAST" });
   const live = units.filter((v) => effectiveStatus(v) === "live");
   const awaiting = units.filter((v) => effectiveStatus(v) === "closed");
+  const submitted = units.filter((v) => v.status === "submitted");
   const sold = units.filter((v) => v.status === "awarded").sort((a, b) => new Date(b.awarded_at) - new Date(a.awarded_at));
 
   const net = await one(`SELECT count(*)::int n, count(DISTINCT lower(dealership))::int stores,
@@ -73,6 +74,17 @@ export default async function Dashboard() {
         <div className="card stat"><div className="k">Bids · 30 days</div><div className="v">{b30.n}</div><div className="s">{b30.units ? `${(b30.n / b30.units).toFixed(1)} per unit` : "—"} · {viewRate == null ? "—" : `${viewRate}% open · ${respRate}% bid`}</div></div>
         <div className="card stat"><div className="k">Spread · this month</div><div className="v">{money(mtd.spread)}</div><div className="s">{mtd.n} sold · {money(mtd.volume)} volume · all-time {money(allTime.spread)}</div></div>
       </div>
+
+      {submitted.length > 0 && (
+        <div className="card" style={{ borderColor: "#e8cf9a" }}>
+          <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Dealer call-outs to review</h2><span className="small ink2">Approve to send them out.</span></div>
+          <div className="tbl-wrap"><table className="data"><thead><tr><th>Unit</th><th className="hide-sm">Seller</th><th className="num">Photos</th><th className="num hide-sm">Submitted</th><th></th></tr></thead><tbody>
+            {submitted.map((v) => (
+              <tr key={v.id}><td><Link href={`/units/${v.id}`} className="row" style={{ gap: 10 }}>{v.photo ? <img src={v.photo} className="thumb" alt="" /> : <span className="thumb" />}<span><b>{title(v)}</b><div className="xs muted">{km(v.km)}</div></span></Link></td><td className="hide-sm small">{v.seller_name || "Dealer call-out"}</td><td className="num">{v.photo_count}</td><td className="num hide-sm small muted">{ago(v.submitted_at)}</td><td className="right"><Link href={`/units/${v.id}`} className="btn sm">Review</Link></td></tr>
+            ))}
+          </tbody></table></div>
+        </div>
+      )}
 
       {awaiting.length > 0 && (
         <div className="card" style={{ borderColor: "#e8cf9a" }}>

@@ -1,9 +1,10 @@
-import { currentUser } from "@/lib/util";
+import { currentUser, currentDealer } from "@/lib/util";
 
 // Free VIN decode from NHTSA vPIC (no key needed).
 export async function GET(req) {
   const user = await currentUser();
-  if (user?.role !== "admin") return Response.json({ error: "Not allowed" }, { status: 401 });
+  const dealer = await currentDealer();
+  if (user?.role !== "admin" && !dealer) return Response.json({ error: "Not allowed" }, { status: 401 });
   const vin = (new URL(req.url).searchParams.get("vin") || "").trim().toUpperCase();
   if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)) return Response.json({ error: "VIN should be 17 characters" }, { status: 400 });
   try {
