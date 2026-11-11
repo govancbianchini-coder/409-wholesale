@@ -177,3 +177,22 @@ textarea { min-height: 84px; resize: vertical; }
 .prose h1 { margin-bottom: 8px; }
 .prose h2 { margin: 24px 0 6px; }
 .prose p, .prose li { color: var(--ink-2); }
+
+/* ---------- Market report ---------- */
+.mr { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 14px; }
+.mr-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.mr-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.mr h3 { font-size: 18px; font-weight: 700; margin-top: 2px; }
+.mr-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 720px) { .mr-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.mr-tile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.mr-tile .k { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.mr-tile .v { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.mr-tile .s { font-size: 11px; color: var(--ink-2); margin-top: 1px; }
+.mr-sub { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin: 18px 0 8px; }
+.mr-table { font-size: 13px; }
+.mr-table th, .mr-table td { padding: 7px 8px; white-space: nowrap; }
+.mr .tbl-wrap { margin: 0 -18px; padding: 0 18px; }
+.mr-table td:first-child, .mr-table th:first-child { padding-left: 0; }
+.mr-carfax { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; padding: 12px 14px; background: #faf9f6; border: 1px solid var(--line); border-radius: 8px; }
+.mr-cta { margin-top: 14px; padding: 12px 14px; background: var(--accent-soft); color: #6f2c07; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; }

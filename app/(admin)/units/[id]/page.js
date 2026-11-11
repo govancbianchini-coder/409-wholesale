@@ -6,6 +6,7 @@ import { money, km, title, when, ago, int, effectiveStatus, STATUS_LABEL, appUrl
 import { sendInvites, award, manualBid, extendClose, closeNow, setStatus, updateDeal, deleteVehicle } from "@/lib/units";
 import { PhotoManager, SendPanel, AwardPanel, ManualBid } from "@/components/UnitPanels";
 import { emailConfigured, smsConfigured } from "@/lib/messaging";
+import MarketReport from "@/components/MarketReport";
 
 export const dynamic = "force-dynamic";
 
@@ -135,6 +136,23 @@ export default async function Unit({ params, searchParams }) {
               </div>
             </div>
           )}
+
+          <div className="card">
+            <div className="hd"><h2>Market report</h2>{v.report_at ? <span className="tag good">Ready · {ago(v.report_at)}</span> : <span className="tag">Not run</span>}</div>
+            <div className="bd">
+              {v.report?.comps?.length ? (
+                <>
+                  <div className="small ink2" style={{ marginBottom: 8 }}>This is what dealers see on the bid page.</div>
+                  <MarketReport report={v.report} unit={v} />
+                </>
+              ) : (
+                <div className="small ink2">
+                  No market report yet. Say <b>“run Overbid research on {v.code}”</b> and the research agent will pull comps from AutoTrader and CarGurus{v.vin ? "" : " (add the VIN first)"} and attach them here.
+                  Dealers still get photos, condition and announcements without it.
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="card">
             <div className="hd"><h2>Photos & history report</h2><span className="small muted">{photos.length} photos</span></div>

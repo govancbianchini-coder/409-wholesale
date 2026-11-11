@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { q, one } from "@/lib/db";
 import { title, km, when, currentUser, money } from "@/lib/util";
 import { Gallery, Countdown, BidBox } from "@/components/BidClient";
+import MarketReport from "@/components/MarketReport";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,10 @@ export default async function BidPage({ params, searchParams }) {
 
           {v.condition_notes && <div className="card"><div className="bd"><h3 style={{ marginBottom: 6 }}>Condition</h3><div className="small ink2" style={{ whiteSpace: "pre-wrap" }}>{v.condition_notes}</div></div></div>}
 
-          {(v.carfax_summary || v.carfax_url) && (
+          {v.report?.comps?.length ? <MarketReport report={v.report} unit={v} /> : null}
+          {v.report?.comps?.length && open ? <div className="mr-cta">Everything you need is above. Put your best number in below.</div> : null}
+
+          {!v.report?.comps?.length && (v.carfax_summary || v.carfax_url) && (
             <div className="card"><div className="bd row between">
               <div><h3>Vehicle history</h3>{v.carfax_summary && <div className="small ink2" style={{ marginTop: 4 }}>{v.carfax_summary}</div>}</div>
               {v.carfax_url && <a className="btn sm" href={v.carfax_url} target="_blank" rel="noopener">View report</a>}

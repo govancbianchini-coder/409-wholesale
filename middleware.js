@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { COOKIE, verify } from "./lib/session";
 
 // Public routes: dealer bid pages, unsubscribe, terms, login, Twilio webhook, static files.
-const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/];
+const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/];
 // Staff (e.g. Kevin) may only use the intake form.
 const STAFF_OK = [/^\/intake/, /^\/logout/];
 

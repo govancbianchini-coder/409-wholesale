@@ -115,3 +115,7 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS messages_created_idx ON messages (created_at DESC);
+
+-- Market report (comps + stats) attached to a unit, filled by the Overbid Research agent
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS report JSONB;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS report_at TIMESTAMPTZ;
