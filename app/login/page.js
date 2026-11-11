@@ -16,7 +16,7 @@ async function login(formData) {
   c.set(COOKIE, await sign(role, name || (role === "admin" ? "Admin" : "Staff")), {
     httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 * 30,
   });
-  redirect(role === "staff" ? "/intake" : next.startsWith("/") ? next : "/");
+  redirect(role === "staff" ? (next.startsWith("/gtm") ? next : "/gtm") : next.startsWith("/") ? next : "/");
 }
 
 export default async function Login({ searchParams }) {

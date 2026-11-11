@@ -4,7 +4,7 @@ import { COOKIE, DEALER_COOKIE, verify } from "./lib/session";
 // Public: dealer bid links, unsubscribe, terms, logins, Twilio webhook, report API (does its own auth), static files.
 const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/, /^\/mark\.svg$/, /^\/icon\.svg$/, /^\/lockup-(dark|light)\.png$/, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
 // Staff (e.g. Kevin) may only use the intake form.
-const STAFF_OK = [/^\/intake/, /^\/logout/];
+const STAFF_OK = [/^\/intake/, /^\/logout/, /^\/gtm/, /^\/api\/gtm/];
 // Dealer area and the APIs a dealer needs (upload, VIN decode).
 const DEALER_AREA = [/^\/d(\/|$)/, /^\/api\/upload/, /^\/api\/vin/];
 
@@ -31,7 +31,7 @@ export async function middleware(req) {
   }
   if (staff.role === "staff" && !STAFF_OK.some((r) => r.test(pathname))) {
     const url = req.nextUrl.clone();
-    url.pathname = "/intake";
+    url.pathname = "/gtm";
     url.search = "";
     return NextResponse.redirect(url);
   }

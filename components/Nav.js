@@ -7,6 +7,7 @@ const LINKS = [
   ["/units", "Units"],
   ["/dealers", "Dealers"],
   ["/intake", "Add dealer"],
+  ["/gtm", "Sign-ups"],
 ];
 
 export default function Nav() {

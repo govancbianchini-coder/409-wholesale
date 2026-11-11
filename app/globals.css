@@ -237,3 +237,53 @@ textarea { min-height: 84px; resize: vertical; }
 .linkbtn { color: #ff8a5c; }
 .pub-top .brand, .topbar .brand, .dtop .brand { color: var(--ink); }
 ::selection { background: var(--accent); color: #0b0f17; }
+
+/* ---------- GTM sign-up tracker (mobile-first, app feel) ---------- */
+.gtm { max-width: 760px; margin: 0 auto; }
+.gtm-tabs { display: flex; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin-bottom: 18px; position: sticky; top: 60px; z-index: 5; }
+.gtm-tabs a { flex: 1; text-align: center; padding: 10px 8px; border-radius: 9px; text-decoration: none; font-weight: 650; font-size: 14px; color: var(--ink-2); }
+.gtm-tabs a.on { background: var(--accent); color: #fff; }
+.gtm-week { background: linear-gradient(135deg, #182033, #0f1522); border: 1px solid var(--line-2); border-radius: 14px; padding: 16px 18px; }
+.gtm-week .wk { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.gtm-week h2 { font-size: 20px; margin-top: 4px; }
+.gtm-week p { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; }
+.bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.bar.good > i { background: var(--good); }
+.store-list { display: flex; flex-direction: column; gap: 8px; }
+.store { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: inherit; }
+.store:active { background: var(--surface-2); }
+.store .ro { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--ink-2); flex: none; }
+.store.done .ro { background: var(--good-soft); color: var(--good); }
+.store .nm { font-weight: 650; font-size: 15px; line-height: 1.25; }
+.store .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.store .st { margin-left: auto; flex: none; }
+.pill.not_contacted { background: var(--surface-2); color: var(--muted); }
+.pill.called { background: #14243f; color: #7fa8ff; }
+.pill.meeting { background: #2a1f3f; color: #c9a7ff; }
+.pill.demo { background: var(--warn-soft); color: var(--warn); }
+.pill.signed, .pill.bidding, .pill.listed, .pill.selling { background: var(--good-soft); color: var(--good); }
+.pill.not_interested { background: var(--bad-soft); color: var(--bad); }
+.pill.A { background: var(--accent-soft); color: #ffb08f; }
+.touch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.touch-grid button { font: inherit; font-size: 14px; font-weight: 600; padding: 14px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink); cursor: pointer; text-align: left; line-height: 1.25; }
+.touch-grid button.good { border-color: var(--good); color: var(--good); }
+.touch-grid button.bad { color: var(--bad); }
+.touch-grid button:active { background: var(--line); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips a { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-2); text-decoration: none; color: var(--ink-2); white-space: nowrap; }
+.chips a.on { background: var(--ink); color: #0b0f17; border-color: var(--ink); }
+.chips.scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.log { list-style: none; margin: 0; padding: 0; }
+.log li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.log li .m { font-size: 12px; color: var(--muted); }
+.kv { display: grid; grid-template-columns: 110px 1fr; gap: 6px 12px; font-size: 14px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field textarea, .field select { font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink); width: 100%; }
+.big { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.target { font-size: 12px; color: var(--muted); }
+.lead-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+@media (max-width: 720px) { .page { padding: 16px 12px 90px; } .gtm-tabs { top: 56px; } }

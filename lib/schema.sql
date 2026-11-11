@@ -160,3 +160,42 @@ ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS dealer_notes TEXT;
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ;
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS review_note TEXT;
 ALTER TABLE photos ADD COLUMN IF NOT EXISTS slot TEXT;   -- e.g. 'ext_front', 'int_dash'
+
+-- ---------- GTM: dealer sign-up tracker ----------
+CREATE TABLE IF NOT EXISTS gtm_targets (
+  id             SERIAL PRIMARY KEY,
+  route_order    INTEGER NOT NULL,
+  cluster_no     INTEGER NOT NULL,
+  cluster        TEXT NOT NULL,
+  dealership     TEXT UNIQUE NOT NULL,
+  brands         TEXT,
+  grp            TEXT,
+  address        TEXT,
+  phone          TEXT,
+  gm             TEXT,
+  gsm            TEXT,
+  contact_notes  TEXT,
+  priority       TEXT NOT NULL DEFAULT 'B',
+  status         TEXT NOT NULL DEFAULT 'not_contacted',
+  owner          TEXT,
+  next_step      TEXT,
+  next_at        DATE,
+  dealership_id  INTEGER REFERENCES dealerships(id) ON DELETE SET NULL,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS gtm_visits (
+  id          SERIAL PRIMARY KEY,
+  target_id   INTEGER NOT NULL REFERENCES gtm_targets(id) ON DELETE CASCADE,
+  by_name     TEXT,
+  kind        TEXT NOT NULL,          -- call | visit | meeting | demo | note
+  outcome     TEXT,                   -- status set by this touch
+  met_with    TEXT,
+  note        TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS gtm_visits_target_idx ON gtm_visits(target_id, created_at DESC);
+CREATE TABLE IF NOT EXISTS gtm_settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT
+);
