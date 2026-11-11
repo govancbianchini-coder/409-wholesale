@@ -40,7 +40,7 @@ Project → **Settings → Environment Variables**:
 | `APP_URL` | `https://your-project.vercel.app` (or your custom domain — update it if you add one) |
 | `RESEND_API_KEY` | from resend.com (see below) |
 | `EMAIL_FROM` | `Overbid <units@overbid.ca>` |
-| `EMAIL_REPLY_TO` | `govan@409motorco.com` |
+| `EMAIL_REPLY_TO` | `govan@overbid.ca` (default if unset) |
 | `TWILIO_ACCOUNT_SID` | from twilio.com console |
 | `TWILIO_AUTH_TOKEN` | from twilio.com console |
 | `TWILIO_FROM` | your Twilio number, e.g. `+15875550123` |
