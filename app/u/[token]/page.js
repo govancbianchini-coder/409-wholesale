@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Logo from "@/components/Logo";
 import { q, one } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export default async function Unsub({ params, searchParams }) {
   if (!c) notFound();
   return (
     <div className="center-card">
-      <div className="brand" style={{ textAlign: "center", marginBottom: 18 }}>OVERBID</div>
+      <div className="brand" style={{ textAlign: "center", marginBottom: 18 }}><Logo size={30} /></div>
       <div className="card"><div className="bd stack">
         {sp?.done && sp.done !== "resub" ? (
           <>

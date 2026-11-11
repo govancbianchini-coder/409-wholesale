@@ -88,7 +88,7 @@ export default async function Unit({ params, searchParams }) {
     <div className="stack">
       {sp?.new && <div className="notice good">Unit created. Add photos, then send it out.</div>}
       {v.status === "submitted" && (
-        <div className="card" style={{ borderColor: "#e8cf9a" }}>
+        <div className="card" style={{ borderColor: "var(--warn)" }}>
           <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Called out by {sellerRow?.dname || "a dealer"} — needs your review</h2><span className="small ink2">{sellerRow ? `${sellerRow.first_name} ${sellerRow.last_name || ""} · ${sellerRow.phone || sellerRow.email || ""}` : ""}</span></div>
           <div className="bd stack-sm">
             {v.dealer_notes && <div className="small"><b>Dealer notes:</b> {v.dealer_notes}</div>}

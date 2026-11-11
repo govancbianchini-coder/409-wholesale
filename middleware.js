@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { COOKIE, DEALER_COOKIE, verify } from "./lib/session";
 
 // Public: dealer bid links, unsubscribe, terms, logins, Twilio webhook, report API (does its own auth), static files.
-const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
+const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/, /^\/mark\.svg$/, /^\/icon\.svg$/, /^\/lockup-(dark|light)\.png$/, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
 // Staff (e.g. Kevin) may only use the intake form.
 const STAFF_OK = [/^\/intake/, /^\/logout/];
 // Dealer area and the APIs a dealer needs (upload, VIN decode).

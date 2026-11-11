@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Logo from "@/components/Logo";
 import { redirect } from "next/navigation";
 import { COOKIE, sign } from "@/lib/session";
 
@@ -23,7 +24,7 @@ export default async function Login({ searchParams }) {
   return (
     <div className="center-card">
       <div style={{ textAlign: "center", marginBottom: 22 }}>
-        <div className="brand" style={{ fontSize: 15 }}>OVERBID</div>
+        <div className="brand"><Logo size={30} /></div>
         <div className="muted small" style={{ marginTop: 4 }}>By 409 Motor Company</div>
       </div>
       <form action={login} className="card">

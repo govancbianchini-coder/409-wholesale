@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Logo from "@/components/Logo";
 import { q, one } from "@/lib/db";
 import { title, km, when, currentUser, money } from "@/lib/util";
 import { Gallery, Countdown, BidBox } from "@/components/BidClient";
@@ -44,7 +45,7 @@ export default async function BidPage({ params, searchParams }) {
 
   return (
     <>
-      <div className="pub-top"><div className="inner"><span className="brand">OVERBID</span><span className="xs" style={{ color: "#9b968d" }}>{c.dealership}</span></div></div>
+      <div className="pub-top"><div className="inner"><span className="brand"><Logo size={24} /></span><span className="xs" style={{ color: "var(--muted)" }}>{c.dealership}</span></div></div>
       {user && <div className="notice warn" style={{ borderRadius: 0, textAlign: "center" }}>Preview as {c.first_name} at {c.dealership}. Your views aren't counted.</div>}
       <div className="pub">
         <Gallery photos={photos} />

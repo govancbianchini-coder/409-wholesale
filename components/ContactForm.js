@@ -43,7 +43,7 @@ export default function ContactForm({ action, initial = {}, mode = "create" }) {
         <label className="f"><span>Cell</span><input type="tel" name="phone" defaultValue={d("phone")} inputMode="tel" placeholder="403 555 0123" autoComplete="off" /></label>
       </div>
 
-      <div className="card" style={{ background: "#faf9f6" }}>
+      <div className="card" style={{ background: "var(--surface-2)" }}>
         <div className="bd stack-sm">
           <div className="small ink2">Read this to them, or hand them the phone:</div>
           <div className="small" style={{ fontStyle: "italic" }}>

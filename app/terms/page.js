@@ -1,9 +1,10 @@
+import Logo from "@/components/Logo";
 export const metadata = { title: "Bid terms · Overbid" };
 
 export default function Terms() {
   return (
     <>
-      <div className="pub-top"><div className="inner"><span className="brand">OVERBID</span></div></div>
+      <div className="pub-top"><div className="inner"><span className="brand"><Logo size={24} /></span></div></div>
       <div className="prose">
         <h1>Wholesale bid terms</h1>
         <p className="small">Overbid is a dealer-to-dealer wholesale platform operated by 409 Motor Company, 101 Highland Park Common NE, Airdrie, AB T4A 0X3 · 403.808.1801. These terms apply to every bid placed through a Overbid link.</p>

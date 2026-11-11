@@ -1,4 +1,5 @@
 import { currentDealer } from "@/lib/util";
+import Logo from "@/components/Logo";
 import DealerNav from "@/components/DealerNav";
 
 export const dynamic = "force-dynamic";
@@ -9,8 +10,8 @@ export default async function DealerLayout({ children }) {
     <>
       <header className="dtop">
         <div className="inner">
-          <a href={d ? "/d" : "/d/login"} className="brand">OVERBID</a>
-          {d ? <DealerNav name={d.name} /> : <span className="xs" style={{ color: "#9b968d" }}>Dealer portal</span>}
+          <a href={d ? "/d" : "/d/login"} className="brand"><Logo size={24} /></a>
+          {d ? <DealerNav name={d.name} /> : <span className="xs" style={{ color: "var(--muted)" }}>Dealer portal</span>}
         </div>
       </header>
       <main className="dshell">{children}</main>

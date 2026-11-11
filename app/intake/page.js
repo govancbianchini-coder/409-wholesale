@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import ContactForm from "@/components/ContactForm";
 import { createContact } from "@/lib/contacts";
 import { currentUser } from "@/lib/util";
@@ -14,8 +15,8 @@ export default async function Intake() {
     <>
       <header className="topbar">
         <div className="inner">
-          <span className="brand">OVERBID</span>
-          {user?.role === "admin" ? <Link href="/" className="who" style={{ marginLeft: "auto", color: "#c9c5bd" }}>← Dashboard</Link> : <div className="who">{user?.name}<a href="/logout">Sign out</a></div>}
+          <span className="brand"><Logo size={24} /></span>
+          {user?.role === "admin" ? <Link href="/" className="who" style={{ marginLeft: "auto", color: "var(--ink-2)" }}>← Dashboard</Link> : <div className="who">{user?.name}<a href="/logout">Sign out</a></div>}
         </div>
       </header>
       <main className="page" style={{ maxWidth: 640 }}>

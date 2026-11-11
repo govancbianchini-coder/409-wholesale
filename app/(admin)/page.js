@@ -76,7 +76,7 @@ export default async function Dashboard() {
       </div>
 
       {submitted.length > 0 && (
-        <div className="card" style={{ borderColor: "#e8cf9a" }}>
+        <div className="card" style={{ borderColor: "var(--warn)" }}>
           <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Dealer call-outs to review</h2><span className="small ink2">Approve to send them out.</span></div>
           <div className="tbl-wrap"><table className="data"><thead><tr><th>Unit</th><th className="hide-sm">Seller</th><th className="num">Photos</th><th className="num hide-sm">Submitted</th><th></th></tr></thead><tbody>
             {submitted.map((v) => (
@@ -87,7 +87,7 @@ export default async function Dashboard() {
       )}
 
       {awaiting.length > 0 && (
-        <div className="card" style={{ borderColor: "#e8cf9a" }}>
+        <div className="card" style={{ borderColor: "var(--warn)" }}>
           <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Needs your call</h2><span className="small ink2">Bidding closed. Award it or pass.</span></div>
           <div className="tbl-wrap">
             <table className="data">

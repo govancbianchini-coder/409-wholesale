@@ -6,7 +6,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport = { width: "device-width", initialScale: 1, themeColor: "#121314" };
+export const viewport = { width: "device-width", initialScale: 1, themeColor: "#0b0f17" };
 
 export default function RootLayout({ children }) {
   return (
