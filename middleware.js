@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { COOKIE, DEALER_COOKIE, verify } from "./lib/session";
 
 // Public: dealer bid links, unsubscribe, terms, logins, Twilio webhook, report API (does its own auth), static files.
-const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/, /^\/mark\.svg$/, /^\/icon\.svg$/, /^\/lockup-(dark|light)\.png$/, /^\/apple-touch-icon\.png$/, /^\/icon-(192|512)\.png$/, /^\/manifest\.webmanifest$/, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
+const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/favicon/, /^\/brand/, /^\/mark\.svg$/, /^\/icon\.svg$/, /^\/lockup-(dark|light)\.png$/, /^\/apple-touch-icon\.png$/, /^\/icon-(192|512)\.png$/, /^\/manifest\.webmanifest$/, /^\/welcome/, /^\/fonts\//, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
 // Staff (e.g. Kevin) may only use the intake form.
 const STAFF_OK = [/^\/intake/, /^\/logout/, /^\/gtm/, /^\/api\/gtm/];
 // Dealer area and the APIs a dealer needs (upload, VIN decode).
@@ -23,6 +23,13 @@ export async function middleware(req) {
     return NextResponse.redirect(url);
   }
 
+  if (!staff && pathname === "/") {
+    // Public landing page for visitors; dealers who are signed in go to their area.
+    const url = req.nextUrl.clone();
+    if (dealer) { url.pathname = "/d"; return NextResponse.redirect(url); }
+    url.pathname = "/welcome";
+    return NextResponse.rewrite(url);
+  }
   if (!staff) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
