@@ -287,3 +287,8 @@ textarea { min-height: 84px; resize: vertical; }
 .target { font-size: 12px; color: var(--muted); }
 .lead-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 @media (max-width: 720px) { .page { padding: 16px 12px 90px; } .gtm-tabs { top: 56px; } }
+.mr-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 640px) { .mr-grid2 { grid-template-columns: 1fr; } }
+.mr-notes { margin: 0; padding-left: 18px; line-height: 1.6; }
+.mr-take { margin-top: 16px; padding: 14px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; }
+.mr-take .mr-eyebrow { color: var(--accent); margin-bottom: 4px; }

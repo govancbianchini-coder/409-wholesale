@@ -32,6 +32,7 @@ export default function MarketReport({ report, unit, compact = false }) {
       <div className="mr-tiles">
         <Tile k={`Within ${(report.radius_km || 1000).toLocaleString("en-CA")} km`} v={st.local_count ?? 0} s={st.local_avg_price ? `avg ${money(st.local_avg_price)} · ${km(st.local_avg_km)}` : "no local comps"} />
         <Tile k="National set" v={st.national_count ?? comps.length} s={st.national_avg_price ? `avg ${money(st.national_avg_price)} · ${km(st.national_avg_km)}` : null} />
+        {report.days_supply != null && <Tile k="Market days supply" v={report.days_supply} s="time to sell at today's pace" />}
         {st.avg_days_listed != null && <Tile k="Avg days listed" v={st.avg_days_listed} s="across the set" />}
         {st.cbb_wholesale && <Tile k="CBB" v={money(st.cbb_wholesale)} s={st.cbb_retail ? `wholesale · retail ${money(st.cbb_retail)}` : "wholesale"} />}
       </div>
@@ -70,6 +71,34 @@ export default function MarketReport({ report, unit, compact = false }) {
           <div className="mr-sub">Market read</div>
           <p className="small" style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{report.summary}</p>
         </>
+      )}
+
+      {(report.recon?.length > 0 || report.notes?.length > 0) && (
+        <div className="mr-grid2">
+          {report.recon?.length > 0 && (
+            <div>
+              <div className="mr-sub">Estimated recon to retail standard</div>
+              <table className="data mr-table"><tbody>
+                {report.recon.map((r, i) => <tr key={i}><td>{r.item}</td><td className="num">{r.est != null ? money(r.est) : "—"}</td></tr>)}
+                {report.recon_total ? <tr><td><b>Total</b></td><td className="num"><b>{money(report.recon_total)}</b></td></tr> : null}
+              </tbody></table>
+              <p className="xs muted" style={{ margin: "6px 0 0" }}>Estimate from photos and notes; confirm on inspection.</p>
+            </div>
+          )}
+          {report.notes?.length > 0 && (
+            <div>
+              <div className="mr-sub">What we noted on the car</div>
+              <ul className="small mr-notes">{report.notes.map((n, i) => <li key={i}>{n}</li>)}</ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {report.my_take && (
+        <div className="mr-take">
+          <div className="mr-eyebrow">Overbid's take</div>
+          <p className="small" style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{report.my_take}</p>
+        </div>
       )}
 
       {(report.carfax?.summary || report.carfax?.url || unit?.carfax_url) && (
