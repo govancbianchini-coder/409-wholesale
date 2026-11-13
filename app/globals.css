@@ -302,3 +302,17 @@ textarea { min-height: 84px; resize: vertical; }
 
 .mr-table tr.local td { background: var(--accent-soft); }
 .mr-local li { margin-bottom: 6px; }
+
+/* Settlement sheet */
+.settle { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--surface); }
+.settle-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.settle-price { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+.settle-progress { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; }
+.settle-steps { list-style: none; margin: 0; padding: 0; }
+.settle-steps li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); opacity: 0.55; }
+.settle-steps li.on, .settle-steps li.now { opacity: 1; }
+.settle-steps .dot { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--line-2); color: #fff; }
+.settle-steps li.on .dot { background: var(--good); }
+.settle-steps li.now .dot { background: var(--accent, #ff5a1f); color: #0b0f17; }
+.settle-steps .lbl { font-weight: 600; }
+.sheet .settle { background: #fff; color: #17181a; }

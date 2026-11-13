@@ -92,7 +92,7 @@ export function PhotoManager({ vehicleId, photos, carfaxUrl }) {
   );
 }
 
-export function SendPanel({ action, vehicleId, candidates, closed }) {
+export function SendPanel({ action, vehicleId, candidates, closed, approve, live }) {
   const [state, formAction, pending] = useActionState(action, null);
   const [filter, setFilter] = useState("");
   const [sel, setSel] = useState(() => new Set(candidates.filter((c) => c.preselect).map((c) => c.id)));
@@ -109,13 +109,14 @@ export function SendPanel({ action, vehicleId, candidates, closed }) {
       {state?.error && <div className="notice bad">{state.error}</div>}
       {state?.ok && (
         <div className={`notice ${state.failed ? "warn" : "good"}`}>
-          Sent {state.emails} email{state.emails === 1 ? "" : "s"} and {state.texts} text{state.texts === 1 ? "" : "s"}.
+          {state.approved ? "Approved and sent. " : ""}Sent {state.emails} email{state.emails === 1 ? "" : "s"} and {state.texts} text{state.texts === 1 ? "" : "s"}.
           {state.failed ? ` ${state.failed} failed — see the dealer's message log.` : ""}
           {state.skipped ? ` ${state.skipped} skipped (no consent for that channel).` : ""}
           {state.simulated ? " Test mode: email/text keys aren't set, so nothing actually went out. Messages were logged." : ""}
+          {state.closes_at ? ` Bidding closes ${new Date(state.closes_at).toLocaleString("en-CA", { timeZone: "America/Edmonton", weekday: "short", hour: "numeric", minute: "2-digit" })}.` : ""}
         </div>
       )}
-      {closed && <div className="notice warn">Bidding has closed. Extend the close time before sending to more dealers.</div>}
+      {closed && <div className="notice warn">Bidding has closed. Pick a bidding window below to re-open it, or send to more dealers.</div>}
       <div className="row wrap">
         <input type="search" placeholder="Filter dealers" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ maxWidth: 260 }} />
         <button type="button" className="btn sm" onClick={() => setMany(shown.filter((c) => c.reachable).map((c) => c.id), true)}>Select shown</button>
@@ -140,10 +141,18 @@ export function SendPanel({ action, vehicleId, candidates, closed }) {
           </tbody>
         </table>
       </div>
-      <div className="row wrap">
+      <div className="row wrap" style={{ alignItems: "center" }}>
         <label className="check"><input type="checkbox" name="via_email" defaultChecked /> Email</label>
         <label className="check"><input type="checkbox" name="via_sms" defaultChecked /> Text</label>
-        <button className="btn accent" disabled={pending || !sel.size || closed} style={{ marginLeft: "auto" }}>{pending ? "Sending…" : `Send to ${sel.size} dealer${sel.size === 1 ? "" : "s"}`}</button>
+        <label className="row" style={{ gap: 6, alignItems: "center" }}><span className="small ink2">Bidding window</span>
+          <select name="window" defaultValue={live ? "keep" : "2"} style={{ width: "auto" }}>
+            <option value="2">2 hours</option>
+            <option value="4">4 hours</option>
+            <option value="24">24 hours</option>
+            {live && <option value="keep">Keep current close</option>}
+          </select>
+        </label>
+        <button className="btn accent" disabled={pending || !sel.size} style={{ marginLeft: "auto" }}>{pending ? "Sending…" : `${approve ? "Approve & send" : "Send"} to ${sel.size} dealer${sel.size === 1 ? "" : "s"}`}</button>
       </div>
       <div className="xs muted">Dealers who already got this unit will get a reminder with the same link. Each dealer only gets the channels they agreed to.</div>
     </form>

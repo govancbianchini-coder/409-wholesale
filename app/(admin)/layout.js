@@ -3,10 +3,13 @@ import Logo from "@/components/Logo";
 import Nav from "@/components/Nav";
 import { currentUser } from "@/lib/util";
 
+import { sweepClosed } from "@/lib/close";
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }) {
   const user = await currentUser();
+  await sweepClosed();
   return (
     <>
       <header className="topbar">

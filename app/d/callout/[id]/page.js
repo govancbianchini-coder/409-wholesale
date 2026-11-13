@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { q, one } from "@/lib/db";
 import { currentDealer, int, title, km, money, when, effectiveStatus, spreadFor } from "@/lib/util";
 import { withdrawCallout } from "@/lib/dealer";
+import SellerDecision from "@/components/SellerDecision";
+import Settlement from "@/components/Settlement";
+import { sweepClosed } from "@/lib/close";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +12,7 @@ export default async function CalloutStatus({ params, searchParams }) {
   const { id } = await params;
   const sp = await searchParams;
   const d = await currentDealer();
+  await sweepClosed();
   const v = await one(`SELECT * FROM vehicles WHERE id = $1 AND submitted_by = $2`, [int(id), d.cid]);
   if (!v) notFound();
   const st = effectiveStatus(v);
@@ -25,11 +29,13 @@ export default async function CalloutStatus({ params, searchParams }) {
     ["Out to bidders", invites.n > 0],
     ["Bidding closed", closed],
     ["Number ready", Boolean(top)],
+    ["Accepted", v.status === "awarded"],
+    ["Paid & picked up", Boolean(v.picked_up_at)],
   ];
 
   return (
     <div className="stack">
-      {sp?.submitted && <div className="notice good"><b>Submitted.</b> Overbid reviews every unit before it goes out — usually within the hour during the day. You'll get a text when bidding opens and again when your number is ready.</div>}
+      {sp?.submitted && <div className="notice good"><b>Submitted.</b> Overbid reviews every unit before it goes out — usually within the hour during the day. We've emailed you a confirmation; you'll hear again when bidding opens and when your number is ready.</div>}
       <div className="row" style={{ gap: 12 }}>
         {photos[0] ? <img src={photos[0].url} className="thumb lg" alt="" /> : null}
         <div><div className="mr-eyebrow">{v.code}</div><h1 style={{ fontSize: 20 }}>{title(v)}</h1><div className="small ink2">{km(v.km)} · {v.vin}</div></div>
@@ -44,6 +50,7 @@ export default async function CalloutStatus({ params, searchParams }) {
         ))}
         {v.status === "rejected" && <div className="notice warn" style={{ marginTop: 10 }}>Overbid couldn't take this one.{v.review_note ? ` ${v.review_note}` : ""} Call 403.808.1801 if you want to talk it through.</div>}
         {st === "live" && <div className="small ink2" style={{ marginTop: 8 }}>Bidding closes {when(v.closes_at)}. Bids stay sealed until then.</div>}
+        {v.status === "no_sale" && <div className="notice" style={{ marginTop: 10 }}>You passed on this number. We'll give you a call about a re-run.</div>}
       </div></div>
 
       {closed && (
@@ -52,13 +59,13 @@ export default async function CalloutStatus({ params, searchParams }) {
           <div className="bd">
             {top ? (
               <>
-                <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em" }} className="num">{money(top - spreadFor(top))}</div>
-                <div className="small ink2" style={{ marginBottom: 12 }}>Overbid's number to you, from the top of {bids.length} live dealer bid{bids.length === 1 ? "" : "s"}. Valid 7 days.</div>
+                <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em" }} className="num">{money(v.status === "awarded" ? v.buy_price : top - spreadFor(top))}</div>
+                <div className="small ink2" style={{ marginBottom: 12 }}>{v.status === "awarded" ? "Accepted. Net to your store." : `Top of ${bids.length} sealed dealer bid${bids.length === 1 ? "" : "s"}, net to you after Overbid's spread. No fees on top. Holds for 7 days.`}</div>
                 {bids.map((b, i) => (
                   <div key={i} className={`bidrank ${i === 0 ? "top" : ""}`}><span>Bid {i + 1}{i === 0 ? " · top" : ""}</span><span className="num">{money(b.amount - spreadFor(b.amount))}</span></div>
                 ))}
-                <div className="xs muted" style={{ marginTop: 10 }}>Bidders are anonymous. Numbers shown are net to you.</div>
-                <a className="btn primary block" style={{ marginTop: 12 }} href={`/d/callout/${v.id}/customer-sheet`}>Customer sheet (PDF) — coming soon</a>
+                <div className="xs muted" style={{ margin: "10px 0 14px" }}>Bidders are anonymous. All numbers shown are net to you.</div>
+                {st === "closed" && <SellerDecision vehicleId={v.id} net={top - spreadFor(top)} />}
               </>
             ) : (
               <div className="small ink2">No bids came in on this one. It stays in the Save-a-deal market so dealers can still bid later.</div>
@@ -66,6 +73,8 @@ export default async function CalloutStatus({ params, searchParams }) {
           </div>
         </div>
       )}
+
+      {v.status === "awarded" && <div className="card"><div className="bd"><Settlement v={v} role="seller" /></div></div>}
 
       {v.dealer_notes && <div className="card"><div className="bd small"><b>Your notes:</b> {v.dealer_notes}</div></div>}
       <div className="photo-grid">{photos.map((p, i) => <div className="ph" key={i}><img src={p.url} alt="" /></div>)}</div>

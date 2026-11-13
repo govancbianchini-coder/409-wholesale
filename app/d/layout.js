@@ -2,10 +2,13 @@ import { currentDealer } from "@/lib/util";
 import Logo from "@/components/Logo";
 import DealerNav from "@/components/DealerNav";
 
+import { sweepClosed } from "@/lib/close";
+
 export const dynamic = "force-dynamic";
 
 export default async function DealerLayout({ children }) {
   const d = await currentDealer();
+  await sweepClosed();
   return (
     <>
       <header className="dtop">

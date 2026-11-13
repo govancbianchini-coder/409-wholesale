@@ -134,3 +134,7 @@ html:has(.sheet) body { background: #f1ede6; color: #0b0f17; }
   .sheet .mr-table td.c-days::before { content: " · "; }
   .sheet .mr-table td.c-days::after { content: " days listed"; }
 }
+
+/* settlement on the sheet */
+.sheet .settle { margin: 0 22px; border-color: var(--rule); background: #fff; --line: #e6e0d6; --line-2: #c9c2b6; --surface: #fff; --surface-2: #f1ede6; --good: #1f9d55; }
+.sheet .settle .lbl { font-size: 14px; letter-spacing: 0; text-transform: none; }

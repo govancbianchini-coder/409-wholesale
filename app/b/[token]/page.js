@@ -4,6 +4,8 @@ import { q, one } from "@/lib/db";
 import { title, km, when, currentUser, money } from "@/lib/util";
 import { Gallery, Countdown, BidBox } from "@/components/BidClient";
 import MarketReport from "@/components/MarketReport";
+import Settlement from "@/components/Settlement";
+import { sweepClosed } from "@/lib/close";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,7 @@ export default async function BidPage({ params, searchParams }) {
   const sp = await searchParams;
   const inv = await one(`SELECT * FROM invitations WHERE token = $1`, [token]);
   if (!inv) notFound();
+  await sweepClosed();
   const v = await one(`SELECT * FROM vehicles WHERE id = $1`, [inv.vehicle_id]);
   const c = await one(`SELECT first_name, dealership FROM contacts WHERE id = $1`, [inv.contact_id]);
   const photos = (await q(`SELECT url FROM photos WHERE vehicle_id = $1 ORDER BY sort, id`, [v.id])).map((p) => p.url);
@@ -89,7 +92,8 @@ export default async function BidPage({ params, searchParams }) {
         </div>
       </div>
 
-      {won && <div className="note good">Your bid of <b>{money(mine?.amount)}</b> won this unit. We'll be in touch about paperwork and pickup.</div>}
+      {won && <div className="note good">Your bid of <b>{money(mine?.amount)}</b> won this unit. Overbid sends the bill of sale; the settlement sheet below tracks payment and pickup.</div>}
+      {won && <section style={{ margin: "16px 0" }}><Settlement v={v} role="buyer" /></section>}
       {!open && !won && v.status === "awarded" && <div className="note">This unit has sold. Thanks for putting a number on it. More coming soon.</div>}
       {!open && !won && v.status !== "awarded" && <div className="note warn">Bidding has closed on this unit.{mine ? ` Your bid: ${money(mine.amount)}.` : ""}</div>}
 

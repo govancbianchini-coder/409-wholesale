@@ -4,7 +4,9 @@ import { q } from "@/lib/db";
 import { unitRows } from "@/lib/stats";
 import { money, km, title, when, ago, int, effectiveStatus, STATUS_LABEL, appUrl, TZ } from "@/lib/util";
 import { spreadFor } from "@/lib/util";
-import { sendInvites, award, manualBid, extendClose, closeNow, setStatus, updateDeal, deleteVehicle, reviewCallout } from "@/lib/units";
+import { sendInvites, award, manualBid, extendClose, closeNow, setStatus, updateDeal, deleteVehicle, reviewCallout, setSettlement } from "@/lib/units";
+import Settlement from "@/components/Settlement";
+import { SETTLEMENT_STEPS, sweepClosed } from "@/lib/close";
 import { PhotoManager, SendPanel, AwardPanel, ManualBid } from "@/components/UnitPanels";
 import { emailConfigured, smsConfigured } from "@/lib/messaging";
 import MarketReport from "@/components/MarketReport";
@@ -20,6 +22,7 @@ export default async function Unit({ params, searchParams }) {
   const { id: raw } = await params;
   const sp = await searchParams;
   const id = int(raw);
+  await sweepClosed();
   const [v] = await unitRows({ where: "v.id = $1", params: [id] });
   if (!v) notFound();
   const st = effectiveStatus(v);
@@ -87,15 +90,18 @@ export default async function Unit({ params, searchParams }) {
   return (
     <div className="stack">
       {sp?.new && <div className="notice good">Unit created. Add photos, then send it out.</div>}
+      {sp?.sent != null && <div className={`notice ${Number(sp.failed) ? "warn" : "good"}`}><b>Approved and sent.</b> {sp.sent} email{sp.sent === "1" ? "" : "s"} and {sp.texts} text{sp.texts === "1" ? "" : "s"}; bidding closes {when(v.closes_at)}.{Number(sp.failed) ? ` ${sp.failed} failed — see the dealer's message log.` : ""}{Number(sp.skipped) ? ` ${sp.skipped} skipped (no consent).` : ""}{sp.sim ? " Test mode: nothing actually went out." : ""} The seller has been told it's live.</div>}
       {v.status === "submitted" && (
         <div className="card" style={{ borderColor: "var(--warn)" }}>
           <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Called out by {sellerRow?.dname || "a dealer"} — needs your review</h2><span className="small ink2">{sellerRow ? `${sellerRow.first_name} ${sellerRow.last_name || ""} · ${sellerRow.phone || sellerRow.email || ""}` : ""}</span></div>
           <div className="bd stack-sm">
             {v.dealer_notes && <div className="small"><b>Dealer notes:</b> {v.dealer_notes}</div>}
-            <div className="small ink2">Check the 16 photos and notes, fix anything in Edit, run research if you want comps on the page, then approve. Approving makes it a draft you can send; the seller's own store is excluded from bidding automatically.</div>
-            <div className="row wrap">
-              <form action={reviewCallout}><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="approve" /><button className="btn primary">Approve</button></form>
-              <form action={reviewCallout} className="row"><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="reject" /><input type="text" name="note" placeholder="Reason (the dealer sees this)" style={{ maxWidth: 260 }} /><button className="btn danger">Reject</button></form>
+            <div className="small ink2">Check the 16 photos and notes, fix anything in Edit, run research so comps are on the page, then <b>Approve &amp; send</b> below — one step. Bidding runs 2 hours from send. The seller's own store is excluded automatically and they're told it's live.</div>
+            {!v.report?.comps?.length && <div className="notice warn">No market report yet. Say <b>“run Overbid research on {v.code}”</b> first so dealers bid off a full sheet.</div>}
+            <SendPanel action={sendInvites} vehicleId={id} candidates={candidates} approve />
+            <div className="row wrap" style={{ marginTop: 6 }}>
+              <form action={reviewCallout} className="row"><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="reject" /><input type="text" name="note" placeholder="Reason (the dealer sees this)" style={{ maxWidth: 260 }} /><button className="btn danger sm">Reject</button></form>
+              <form action={reviewCallout} style={{ marginLeft: "auto" }}><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="approve" /><button className="linkbtn small muted">Approve without sending yet</button></form>
             </div>
           </div>
         </div>
@@ -152,7 +158,7 @@ export default async function Unit({ params, searchParams }) {
               <div className="hd"><h2>Send to dealers</h2>{testMode && <span className="tag accent">Test mode{!emailConfigured() ? " · email" : ""}{!smsConfigured() ? " · text" : ""}</span>}</div>
               <div className="bd">
                 {!photos.length && <div className="notice warn" style={{ marginBottom: 14 }}>Add photos first. Dealers bid stronger with a full set.</div>}
-                <SendPanel action={sendInvites} vehicleId={id} candidates={candidates} closed={st !== "live" && st !== "draft"} />
+                <SendPanel action={sendInvites} vehicleId={id} candidates={candidates} closed={st === "closed"} live={st === "live"} />
               </div>
             </div>
           )}
@@ -211,7 +217,17 @@ export default async function Unit({ params, searchParams }) {
                 <div>Sold to dealer: <b className="num">{money(v.sell_price)}</b></div>
                 <div>Paid to seller: <b className="num">{money(v.buy_price)}</b></div>
                 <div>Spread: <b className="num">{money(spread)}</b></div>
-                <div className="muted">Awarded {when(v.awarded_at)}</div>
+                <div className="muted">{v.offer_accepted_at && v.submitted_by ? "Seller accepted" : "Awarded"} {when(v.awarded_at)}</div>
+                <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "6px 0" }} />
+                <div><b>Settlement</b> <span className="muted">— tick each step; the right party is notified.</span></div>
+                {SETTLEMENT_STEPS.map(([k, label]) => (
+                  <form key={k} action={setSettlement} className="row" style={{ gap: 8, alignItems: "center" }}>
+                    <input type="hidden" name="id" value={id} /><input type="hidden" name="step" value={k} /><input type="hidden" name="on" value={v[k] ? "0" : "1"} />
+                    <button className={`btn sm ${v[k] ? "" : "primary"}`} style={{ minWidth: 28 }}>{v[k] ? "✓" : "○"}</button>
+                    <span className={v[k] ? "" : "ink2"}>{label}{v[k] ? <span className="xs muted"> · {when(v[k])}</span> : null}</span>
+                  </form>
+                ))}
+                <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "6px 0" }} />
                 <form action={updateDeal} className="stack-sm" style={{ marginTop: 10 }}>
                   <input type="hidden" name="id" value={id} />
                   <div className="row"><input type="text" inputMode="numeric" name="buy_price" defaultValue={v.buy_price ?? ""} placeholder="Paid to seller" /><input type="text" inputMode="numeric" name="sell_price" defaultValue={v.sell_price ?? ""} placeholder="Sold for" /></div>

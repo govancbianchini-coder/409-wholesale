@@ -199,3 +199,12 @@ CREATE TABLE IF NOT EXISTS gtm_settings (
   key   TEXT PRIMARY KEY,
   value TEXT
 );
+
+-- ===== Close + settlement (process pass) =====
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS close_notified_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS offer_accepted_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS buyer_paid_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS seller_paid_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS released_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS picked_up_at TIMESTAMPTZ;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS settlement_note TEXT;
