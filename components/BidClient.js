@@ -4,10 +4,28 @@ import { placeBid } from "@/lib/bidding";
 
 export function Gallery({ photos }) {
   const [i, setI] = useState(0);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); if (e.key === "ArrowRight") setI((x) => (x + 1) % photos.length); if (e.key === "ArrowLeft") setI((x) => (x - 1 + photos.length) % photos.length); };
+    window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
+  }, [open, photos.length]);
   if (!photos.length) return <div className="gallery"><div className="main" /></div>;
   return (
     <div className="gallery">
-      <img className="main" src={photos[i]} alt="" onClick={() => setI((i + 1) % photos.length)} />
+      {/* Whole photo always visible (portrait phone shots are letterboxed, not cropped); tap for full screen. */}
+      <img className="main" src={photos[i]} alt="" onClick={() => setOpen(true)} />
+      <span className="count">{i + 1} / {photos.length}</span>
+      {open && (
+        <div className="lightbox" onClick={() => setOpen(false)}>
+          <img src={photos[i]} alt="" onClick={(e) => { e.stopPropagation(); setI((i + 1) % photos.length); }} />
+          <button type="button" className="x" onClick={() => setOpen(false)} aria-label="Close">×</button>
+          {photos.length > 1 && <>
+            <button type="button" className="nav l" onClick={(e) => { e.stopPropagation(); setI((i - 1 + photos.length) % photos.length); }} aria-label="Previous">‹</button>
+            <button type="button" className="nav r" onClick={(e) => { e.stopPropagation(); setI((i + 1) % photos.length); }} aria-label="Next">›</button>
+          </>}
+        </div>
+      )}
       {photos.length > 1 && (
         <div className="strip">
           {photos.map((p, n) => (

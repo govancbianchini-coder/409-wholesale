@@ -14,9 +14,11 @@ function Tile({ k, v, s }) {
 export default function MarketReport({ report, unit, compact = false }) {
   if (!report || !report.comps?.length) return null;
   const st = report.stats || {};
-  const comps = report.comps;
+  const comps = [...report.comps].sort((a, b) => ((a.distance_km ?? 9e9) - (b.distance_km ?? 9e9)) || ((a.km ?? 9e9) - (b.km ?? 9e9)));
   const hasDays = comps.some((c) => c.days != null);
   const hasDist = comps.some((c) => c.distance_km != null);
+  const radius = report.radius_km || 1000;
+  const local = comps.filter((c) => c.distance_km != null && c.distance_km <= radius);
   const gen = report.generated_at ? new Date(report.generated_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }) : null;
 
   return (
@@ -39,37 +41,46 @@ export default function MarketReport({ report, unit, compact = false }) {
 
       {report.search_notes && <p className="small ink2" style={{ margin: "10px 0 0" }}>{report.search_notes}</p>}
 
-      <div className="mr-sub">Comparable vehicles <span className="muted">· sorted by km{hasDist ? ", distance from Airdrie" : ""}</span></div>
+      <div className="mr-sub">Comparable vehicles <span className="muted">· nearest first{hasDist ? ", distance from Airdrie" : ""}</span></div>
       <div className="tbl-wrap">
         <table className="data mr-table">
           <thead>
             <tr>
-              <th>Yr</th><th>Colour</th><th className="num">Km</th><th className="num">Price</th>
-              {hasDays && <th className="num">Days</th>}
-              <th>Seller</th>
               {hasDist && <th className="num">Dist (km)</th>}
+              <th>Yr</th><th className="num">Km</th><th className="num">Price</th>
+              {hasDays && <th className="num">Days</th>}
+              <th>Seller</th><th>Colour</th>
             </tr>
           </thead>
           <tbody>
             {comps.map((c, i) => (
-              <tr key={i}>
+              <tr key={i} className={c.distance_km != null && c.distance_km <= radius ? "local" : ""}>
+                {hasDist && <td className="num">{c.distance_km != null ? c.distance_km.toLocaleString("en-CA") : "—"}</td>}
                 <td>{c.year ?? "—"}</td>
-                <td>{c.colour || "—"}</td>
                 <td className="num">{c.km != null ? c.km.toLocaleString("en-CA") : "—"}</td>
                 <td className="num"><b>{money(c.price)}</b></td>
                 {hasDays && <td className="num">{c.days ?? "—"}</td>}
                 <td>{c.url ? <a href={c.url} target="_blank" rel="noopener">{c.seller || c.source || "Listing"}</a> : (c.seller || "—")}{c.city ? <span className="muted"> · {c.city}</span> : null}</td>
-                {hasDist && <td className="num">{c.distance_km != null ? c.distance_km.toLocaleString("en-CA") : "—"}</td>}
+                <td>{c.colour || "—"}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {report.summary && (
+      {(report.summary || local.length > 0) && (
         <>
           <div className="mr-sub">Market read</div>
-          <p className="small" style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{report.summary}</p>
+          {local.length > 0 && (
+            <ul className="small mr-notes mr-local">
+              {local.map((c, i) => (
+                <li key={i}>
+                  <b>{c.seller || "Dealer"}</b>{c.city ? `, ${c.city}` : ""} · {c.distance_km.toLocaleString("en-CA")} km away — {c.year} {c.trim || ""}, {c.km != null ? c.km.toLocaleString("en-CA") + " km" : "km n/a"}, asking <b>{money(c.price)}</b>{c.days != null ? ` · ${c.days} days listed` : ""}{c.url ? <> · <a href={c.url} target="_blank" rel="noopener">listing</a></> : null}
+                </li>
+              ))}
+            </ul>
+          )}
+          {report.summary && <p className="small" style={{ margin: local.length ? "10px 0 0" : 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{report.summary}</p>}
         </>
       )}
 
