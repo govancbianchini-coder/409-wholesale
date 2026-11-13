@@ -76,6 +76,18 @@ export default function CalloutStart() {
     return () => { stop = true; streamRef.current?.getTracks().forEach((t) => t.stop()); };
   }, [scan]);
 
+  // Most common colours first (what Alberta lots actually carry), then the rest.
+  const EXT = ["Black", "White", "Grey", "Silver", "Blue", "Red", "Brown", "Green", "Beige", "Gold", "Orange", "Yellow", "Burgundy", "Purple", "Other"];
+  const INT = ["Black", "Beige / Tan", "Grey", "Brown", "Red", "White / Cream", "Blue", "Other"];
+  const Sel = (k, label, opts) => (
+    <label className="f"><span>{label}</span>
+      <select name={k} value={val(k)} onChange={set(k)} required>
+        <option value="">Choose…</option>
+        {opts.map((o) => <option key={o} value={o}>{o}</option>)}
+        {val(k) && !opts.includes(val(k)) && <option value={val(k)}>{val(k)}</option>}
+      </select>
+    </label>
+  );
   const I = (k, label, props = {}) => <label className={`f ${props.full ? "full" : ""}`}><span>{label}</span><input type="text" name={k} value={val(k)} onChange={set(k)} autoComplete="off" {...props} full={undefined} /></label>;
 
   return (
@@ -98,8 +110,8 @@ export default function CalloutStart() {
         {I("model", "Model", { required: true })}
         {I("trim", "Trim")}
         {I("km", "Kilometres", { inputMode: "numeric", required: true })}
-        {I("exterior", "Exterior colour")}
-        {I("interior", "Interior")}
+        {Sel("exterior", "Exterior colour", EXT)}
+        {Sel("interior", "Interior colour", INT)}
         {I("drivetrain", "Drivetrain")}
         <input type="hidden" name="engine" value={val("engine")} />
         <input type="hidden" name="transmission" value={val("transmission")} />

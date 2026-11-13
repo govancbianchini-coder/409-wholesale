@@ -55,13 +55,13 @@ export default function MarketReport({ report, unit, compact = false }) {
           <tbody>
             {comps.map((c, i) => (
               <tr key={i} className={c.distance_km != null && c.distance_km <= radius ? "local" : ""}>
-                {hasDist && <td className="num">{c.distance_km != null ? c.distance_km.toLocaleString("en-CA") : "—"}</td>}
-                <td>{c.year ?? "—"}</td>
-                <td className="num">{c.km != null ? c.km.toLocaleString("en-CA") : "—"}</td>
-                <td className="num"><b>{money(c.price)}</b></td>
-                {hasDays && <td className="num">{c.days ?? "—"}</td>}
-                <td>{c.url ? <a href={c.url} target="_blank" rel="noopener">{c.seller || c.source || "Listing"}</a> : (c.seller || "—")}{c.city ? <span className="muted"> · {c.city}</span> : null}</td>
-                <td>{c.colour || "—"}</td>
+                {hasDist && <td className="num c-dist">{c.distance_km != null ? c.distance_km.toLocaleString("en-CA") : "—"}</td>}
+                <td className="c-yr">{c.year ?? "—"}</td>
+                <td className="num c-km">{c.km != null ? c.km.toLocaleString("en-CA") : "—"}</td>
+                <td className="num c-price"><b>{money(c.price)}</b></td>
+                {hasDays && <td className="num c-days">{c.days ?? "—"}</td>}
+                <td className="c-seller">{c.url ? <a href={c.url} target="_blank" rel="noopener">{c.seller || c.source || "Listing"}</a> : (c.seller || "—")}{c.city ? <span className="muted"> · {c.city}</span> : null}</td>
+                <td className="c-colour">{c.colour || "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -89,7 +89,7 @@ export default function MarketReport({ report, unit, compact = false }) {
           {report.recon?.length > 0 && (
             <div>
               <div className="mr-sub">Estimated recon to retail standard</div>
-              <table className="data mr-table"><tbody>
+              <table className="data mr-table mr-recon"><tbody>
                 {report.recon.map((r, i) => <tr key={i}><td>{r.item}</td><td className="num">{r.est != null ? money(r.est) : "—"}</td></tr>)}
                 {report.recon_total ? <tr><td><b>Total</b></td><td className="num"><b>{money(report.recon_total)}</b></td></tr> : null}
               </tbody></table>

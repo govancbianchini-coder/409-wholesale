@@ -108,3 +108,29 @@ html:has(.sheet) body { background: #f1ede6; color: #0b0f17; }
 
 /* staff preview banner */
 .sheet .preview { background: #fdf4e3; border-bottom: 1px solid #a3650e; color: #6b4300; font-size: 12px; text-align: center; padding: 6px 10px; }
+
+/* comps: stacked cards on phones, table on wider screens */
+@media (max-width: 600px) {
+  .sheet .mr-table thead { display: none; }
+  .sheet .mr-table, .sheet .mr-table tbody, .sheet .mr-table tr { display: block; }
+  .sheet .mr-table tr { padding: 10px 0 10px 12px; border-bottom: 1px solid var(--rule); display: flex; flex-wrap: wrap; align-items: baseline; }
+  .sheet .mr-table tr.local { border-left: 4px solid var(--orange); padding-left: 10px; }
+  .sheet .mr-table tr.local td { background: transparent; }
+  .sheet .mr-table td { padding: 0; border: 0; white-space: normal; text-align: left; display: block; }
+  .sheet .mr-table td.c-price { order: 1; flex-basis: 100%; font-size: 20px; font-family: "Bebas Neue", Impact, sans-serif; letter-spacing: .02em; }
+  .sheet .mr-table td.c-yr { order: 2; } .sheet .mr-table td.c-km { order: 3; } .sheet .mr-table td.c-colour { order: 4; }
+  .sheet .mr-table td.c-seller { order: 5; flex-basis: 100%; } .sheet .mr-table td.c-dist { order: 6; } .sheet .mr-table td.c-days { order: 7; }
+  .sheet .mr-table td.c-yr::after { content: " · "; color: var(--muted); }
+  .sheet .mr-table td.c-km::after { content: " km"; }
+  .sheet .mr-table td.c-colour { color: var(--muted); }
+  .sheet .mr-recon tr { justify-content: space-between; padding-left: 0; }
+  .sheet .mr-recon td.num { margin-left: auto; }
+  .sheet .mr-table td.c-colour::before { content: " · "; }
+  .sheet .mr-table td.c-seller { font-size: 13.5px; margin-top: 3px; }
+  .sheet .mr-table td.c-dist { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+  .sheet .mr-table td.c-dist::before { content: " · "; font-weight: 400; color: var(--muted); }
+  .sheet .mr-table td.c-dist::after { content: " km away"; }
+  .sheet .mr-table td.c-days { font-size: 12.5px; color: var(--muted); }
+  .sheet .mr-table td.c-days::before { content: " · "; }
+  .sheet .mr-table td.c-days::after { content: " days listed"; }
+}
