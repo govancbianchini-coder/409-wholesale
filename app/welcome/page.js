@@ -77,13 +77,13 @@ export default function Welcome() {
           <div className="head">
             <div>
               <div className="kicker rv">How it works</div>
-              <h2 className="rv">Phone, VIN, fifteen photos. The network does the rest.</h2>
+              <h2 className="rv">Phone, VIN, sixteen photos. The network does the rest.</h2>
             </div>
             <p className="lead rv" style={{ "--d": ".1s" }}>No software to install and no workflow change. Your lot attendant can list a unit in two minutes; Overbid builds the market report and reviews it within the hour.</p>
           </div>
           <div className="steps">
             {[
-              ["01", "List it from your phone", "VIN, mileage and 15 photos. Two minutes on the lot. Overbid builds the market report (retail comps, CARFAX when available) and reviews the unit within the hour."],
+              ["01", "List it from your phone", "VIN, mileage and 16 photos. Two minutes on the lot. Overbid builds the market report (retail comps, CARFAX when available) and reviews the unit within the hour."],
               ["02", "The network bids", "Franchise stores across Calgary see the unit and bid within 2 hours. They see photos and a report, never your store name. Your own store cannot bid on your unit."],
               ["03", "You see the top three to five", "Bid 1 through 5, net to you, no names. Take the top number or decline. No reserve, no obligation."],
               ["04", "Money first, then the unit", "The deal settles through Overbid and the buyer picks up after the funds clear. You are paid before the unit leaves your lot."],

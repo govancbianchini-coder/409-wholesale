@@ -23,26 +23,52 @@ export default function CalloutStart() {
     setMsg(d.make ? `${d.year} ${d.make} ${d.model} — check the trim, then km.` : "Couldn't decode that VIN. Fill it in by hand.");
   }
 
-  // Barcode scan with the phone camera (Chrome/Android, Safari 17+). Falls back to typing.
+  // Barcode scan with the phone camera. Uses the browser's BarcodeDetector where it exists (Chrome/Android),
+  // otherwise a WASM decoder (iPhone Safari has no BarcodeDetector). VIN plates are Code 39/128, sometimes QR.
   useEffect(() => {
     if (!scan) return;
     let stop = false;
     (async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } });
         streamRef.current = stream;
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        if (!("BarcodeDetector" in window)) { setMsg("This browser can't scan barcodes — type the VIN instead."); setScan(false); return; }
-        const det = new window.BarcodeDetector({ formats: ["code_39", "code_128", "qr_code", "data_matrix"] });
+        setMsg("Hold the barcode inside the frame…");
+
+        const pick = (values) => {
+          for (const raw of values) {
+            const s = String(raw || "").replace(/[^A-Z0-9]/gi, "").toUpperCase();
+            const m = s.match(/[A-HJ-NPR-Z0-9]{17}/);
+            if (m) return m[0];
+          }
+          return null;
+        };
+        const done = (vin) => { setF((x) => ({ ...x, vin })); setScan(false); decode(vin); };
+
+        let detect;
+        if ("BarcodeDetector" in window) {
+          const det = new window.BarcodeDetector({ formats: ["code_39", "code_128", "qr_code", "data_matrix"] });
+          detect = async () => pick((await det.detect(videoRef.current)).map((c) => c.rawValue));
+        } else {
+          const { readBarcodes, prepareZXingModule } = await import("zxing-wasm/reader");
+          prepareZXingModule({ overrides: { locateFile: (path, prefix) => (path.endsWith(".wasm") ? "/zxing_reader.wasm" : prefix + path) } });
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          detect = async () => {
+            const v = videoRef.current;
+            if (!v || !v.videoWidth) return null;
+            canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+            ctx.drawImage(v, 0, 0);
+            const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const res = await readBarcodes(img, { formats: ["Code39", "Code128", "QRCode", "DataMatrix"], tryHarder: true, tryRotate: true, maxNumberOfSymbols: 4 });
+            return pick(res.map((r) => r.text));
+          };
+        }
         const tick = async () => {
           if (stop) return;
-          try {
-            const codes = await det.detect(videoRef.current);
-            const hit = codes.map((c) => c.rawValue.replace(/[^A-Z0-9]/gi, "").toUpperCase()).find((s) => /^[A-HJ-NPR-Z0-9]{17}$/.test(s) || /^I?[A-HJ-NPR-Z0-9]{17}$/.test(s));
-            if (hit) { const vin = hit.slice(-17); setF((x) => ({ ...x, vin })); setScan(false); decode(vin); return; }
-          } catch {}
-          requestAnimationFrame(tick);
+          try { const vin = await detect(); if (vin) { done(vin); return; } } catch {}
+          setTimeout(tick, 180);
         };
         tick();
       } catch (e) { setMsg("Camera not available — type the VIN instead."); setScan(false); }
