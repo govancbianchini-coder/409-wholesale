@@ -92,7 +92,7 @@ export default async function Unit({ params, searchParams }) {
           <div className="hd" style={{ background: "var(--warn-soft)" }}><h2>Called out by {sellerRow?.dname || "a dealer"} — needs your review</h2><span className="small ink2">{sellerRow ? `${sellerRow.first_name} ${sellerRow.last_name || ""} · ${sellerRow.phone || sellerRow.email || ""}` : ""}</span></div>
           <div className="bd stack-sm">
             {v.dealer_notes && <div className="small"><b>Dealer notes:</b> {v.dealer_notes}</div>}
-            <div className="small ink2">Check the photos and notes, fix anything in Edit, run research if you want comps on the page, then approve. Approving makes it a draft you can send; the seller's own store is excluded from bidding automatically.</div>
+            <div className="small ink2">Check the 16 photos and notes, fix anything in Edit, run research if you want comps on the page, then approve. Approving makes it a draft you can send; the seller's own store is excluded from bidding automatically.</div>
             <div className="row wrap">
               <form action={reviewCallout}><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="approve" /><button className="btn primary">Approve</button></form>
               <form action={reviewCallout} className="row"><input type="hidden" name="id" value={id} /><input type="hidden" name="decision" value="reject" /><input type="text" name="note" placeholder="Reason (the dealer sees this)" style={{ maxWidth: 260 }} /><button className="btn danger">Reject</button></form>
