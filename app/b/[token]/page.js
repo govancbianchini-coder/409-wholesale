@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Logo from "@/components/Logo";
+import "../sheet.css";
 import { q, one } from "@/lib/db";
 import { title, km, when, currentUser, money } from "@/lib/util";
 import { Gallery, Countdown, BidBox } from "@/components/BidClient";
@@ -36,63 +36,95 @@ export default async function BidPage({ params, searchParams }) {
     ["Kilometres", km(v.km)],
     ["Exterior", v.exterior],
     ["Interior", v.interior],
-    ["Engine", v.engine],
     ["Drivetrain", v.drivetrain],
+    ["Engine", v.engine],
     ["Transmission", v.transmission],
     ["VIN", v.vin],
     ["Location", v.location],
   ].filter(([, x]) => x);
 
+  const rep = v.report?.comps?.length ? v.report : null;
+  const st = rep?.stats || {};
+  const radius = rep?.radius_km || 1000;
+  const vinLine = [v.vin ? `VIN ${v.vin}` : null, km(v.km), v.exterior].filter(Boolean).join(" · ");
+
   return (
-    <>
-      <div className="pub-top"><div className="inner"><span className="brand"><Logo size={24} /></span><span className="xs" style={{ color: "var(--muted)" }}>{c.dealership}</span></div></div>
-      {user && <div className="notice warn" style={{ borderRadius: 0, textAlign: "center" }}>Preview as {c.first_name} at {c.dealership}. Your views aren't counted.</div>}
-      <div className="pub">
-        <Gallery photos={photos} />
-        <div className="pub-body">
-          <div className="row between" style={{ alignItems: "flex-start" }}>
-            <div>
-              <h1 style={{ fontSize: 22 }}>{title(v)}</h1>
-              <div className="ink2 small" style={{ marginTop: 2 }}>{km(v.km)} · {v.code}</div>
-            </div>
-            <div className="right">
-              <div className="xs muted" style={{ textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 600 }}>{open ? "Closes in" : "Bidding"}</div>
-              <div style={{ fontSize: 18 }}>{open ? <Countdown to={v.closes_at} /> : <b>Closed</b>}</div>
-              <div className="xs muted">{when(v.closes_at)}</div>
-            </div>
-          </div>
+    <div className="sheet">
+      {user && <div className="preview">Preview as {c.first_name} at {c.dealership}. Your views aren't counted.</div>}
 
-          {won && <div className="notice good" style={{ marginTop: 14 }}>Your bid of <b>{money(mine?.amount)}</b> won this unit. We'll be in touch about paperwork and pickup.</div>}
-          {!open && !won && v.status === "awarded" && <div className="notice" style={{ marginTop: 14 }}>This unit has sold. Thanks for putting a number on it. More coming soon.</div>}
-          {!open && !won && v.status !== "awarded" && <div className="notice warn" style={{ marginTop: 14 }}>Bidding has closed on this unit.{mine ? ` Your bid: ${money(mine.amount)}.` : ""}</div>}
+      <header className="band">
+        <div>
+          <img src="/lockup-dark.png" alt="Overbid" />
+          <div className="eyebrow">Dealer bid sheet · {v.code}</div>
+          <h1 className="display">{title(v)}</h1>
+          <div className="vin">{vinLine}</div>
+        </div>
+        <div className="to">
+          Prepared for<b>{c.dealership}</b>
+          {open ? <a href="#bid">Place your bid ↓</a> : <span>Bidding closed</span>}
+        </div>
+      </header>
 
-          {v.announcements && (
-            <div className="card"><div className="bd"><h3 style={{ marginBottom: 6 }}>Announcements</h3><div className="small" style={{ whiteSpace: "pre-wrap" }}>{v.announcements}</div></div></div>
+      <Gallery photos={photos} />
+
+      <div className="tiles">
+        <div className="tile hi">
+          <p className="lbl">{open ? "Bidding closes in" : "Bidding"}</p>
+          <div className="v">{open ? <Countdown to={v.closes_at} /> : "Closed"}</div>
+          <div className="s">{when(v.closes_at)} · blind bids, change yours until it closes</div>
+        </div>
+        <div className="tile">
+          <p className="lbl">Comparable units</p>
+          <div className="v">{rep ? (st.national_count ?? rep.comps.length) : "—"}</div>
+          <div className="s">{rep ? `${st.local_count ?? 0} within ${radius.toLocaleString("en-CA")} km${st.local_avg_price ? ` · avg ask ${money(st.local_avg_price)}` : ""}` : "Market report pending"}</div>
+        </div>
+        <div className="tile">
+          {rep?.days_supply != null ? (
+            <><p className="lbl">Market days supply</p><div className="v">{rep.days_supply} days</div><div className="s">Time to sell at today's pace</div></>
+          ) : rep?.recon_total ? (
+            <><p className="lbl">Est. recon to retail</p><div className="v">{money(rep.recon_total)}</div><div className="s">Itemized below · confirm on inspection</div></>
+          ) : (
+            <><p className="lbl">Kilometres</p><div className="v">{km(v.km)}</div><div className="s">{v.exterior || ""}{v.interior ? ` · ${v.interior}` : ""}</div></>
           )}
-
-          <div className="card"><div className="bd">
-            <div className="specs">{specs.map(([k, x]) => <div key={k}><b>{k}</b>{x}</div>)}</div>
-          </div></div>
-
-          {v.condition_notes && <div className="card"><div className="bd"><h3 style={{ marginBottom: 6 }}>Condition</h3><div className="small ink2" style={{ whiteSpace: "pre-wrap" }}>{v.condition_notes}</div></div></div>}
-
-          {v.report?.comps?.length ? <MarketReport report={v.report} unit={v} /> : null}
-          {v.report?.comps?.length && open ? <div className="mr-cta">Everything you need is above. Put your best number in below.</div> : null}
-
-          {!v.report?.comps?.length && (v.carfax_summary || v.carfax_url) && (
-            <div className="card"><div className="bd row between">
-              <div><h3>Vehicle history</h3>{v.carfax_summary && <div className="small ink2" style={{ marginTop: 4 }}>{v.carfax_summary}</div>}</div>
-              {v.carfax_url && <a className="btn sm" href={v.carfax_url} target="_blank" rel="noopener">View report</a>}
-            </div></div>
-          )}
-
-          <p className="xs muted" style={{ marginTop: 18, lineHeight: 1.6 }}>
-            Bids are blind. No one sees anyone else's number. You can change your bid until it closes. Questions: 403.808.1801.
-            <br />Overbid, a 409 Motor Company platform · 101 Highland Park Common NE, Airdrie AB · <a href="/terms">Bid terms</a>
-          </p>
         </div>
       </div>
-      <BidBox token={token} current={mine?.amount} open={open} />
-    </>
+
+      {won && <div className="note good">Your bid of <b>{money(mine?.amount)}</b> won this unit. We'll be in touch about paperwork and pickup.</div>}
+      {!open && !won && v.status === "awarded" && <div className="note">This unit has sold. Thanks for putting a number on it. More coming soon.</div>}
+      {!open && !won && v.status !== "awarded" && <div className="note warn">Bidding has closed on this unit.{mine ? ` Your bid: ${money(mine.amount)}.` : ""}</div>}
+
+      {(v.announcements || v.condition_notes) && (
+        <section className="sec">
+          <p className="lbl">Seller's announcements</p>
+          {v.announcements && <div className="ptext">{v.announcements}</div>}
+          {v.condition_notes && <div className="ptext" style={{ marginTop: 8 }}>{v.condition_notes}</div>}
+        </section>
+      )}
+
+      <section className="sec">
+        <p className="lbl">Vehicle</p>
+        <div className="specs">{specs.map(([k, x]) => <div key={k}><b>{k}</b>{x}</div>)}</div>
+      </section>
+
+      {rep ? <MarketReport report={rep} unit={v} /> : null}
+
+      {!rep && (v.carfax_summary || v.carfax_url) && (
+        <section className="sec">
+          <p className="lbl">Vehicle history</p>
+          <div className="ptext">{v.carfax_summary}</div>
+          {v.carfax_url && <p><a href={v.carfax_url} target="_blank" rel="noopener">View report</a></p>}
+        </section>
+      )}
+
+      <div className="bidwrap">
+        <BidBox token={token} current={mine?.amount} open={open} sheet />
+      </div>
+      <p className="blind">Bids are blind: no one sees anyone else's number. You can change your bid until it closes. The seller sees the top bids net of Overbid's spread and takes the number or declines. Questions: 403.808.1801.</p>
+
+      <footer className="foot">
+        <span><b>Prepared by Overbid</b> · a 409 Motor Company platform</span>
+        <span>101 Highland Park Common NE, Unit 1006, Airdrie, AB · overbid.ca · <a href="/terms">Bid terms</a></span>
+      </footer>
+    </div>
   );
 }
