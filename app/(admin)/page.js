@@ -3,6 +3,7 @@ import { q, one } from "@/lib/db";
 import { unitRows, dealerStats } from "@/lib/stats";
 import { money, km, title, when, ago, effectiveStatus, phonePretty } from "@/lib/util";
 import { emailConfigured, smsConfigured } from "@/lib/messaging";
+import TestSend from "@/components/TestSend";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,15 @@ export default async function Dashboard() {
           Sends are logged but nothing reaches dealers. The setup guide covers the keys.
         </div>
       )}
+      <div className="card"><div className="bd stack-sm">
+        <div className="row wrap" style={{ gap: 16, alignItems: "center" }}>
+          <div><b>Channels</b> <span className="small ink2">— email {emailConfigured() ? "connected" : "not connected"} · texting {smsConfigured() ? "connected" : "not connected"}</span></div>
+        </div>
+        <div className="row wrap" style={{ gap: 20 }}>
+          <TestSend channel="sms" placeholder="Your cell, e.g. 403 333 7296" />
+          <TestSend channel="email" placeholder="you@overbid.ca" />
+        </div>
+      </div></div>
 
       <div className="grid g4">
         <div className="card stat"><div className="k">Dealer network</div><div className="v">{net.reachable}</div><div className="s">reachable · {net.n} contacts at {net.stores} stores{net.week ? ` · +${net.week} this week` : ""}</div></div>
