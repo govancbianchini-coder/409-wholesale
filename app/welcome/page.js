@@ -28,7 +28,7 @@ export default function Welcome() {
         <div className="wrap">
           <a className="logo" href="/" aria-label="Overbid"><img className="on-dark" src="/lockup-dark.png" alt="Overbid" /><img className="on-light" src="/lockup-light.png" alt="" /></a>
           <nav>
-            <a href="#how">How it works</a>
+            <a href="#how">How it works</a><a href="#standard">The standard</a>
             <a href="#dealers">For dealers</a>
             <a href="#pricing">Pricing</a>
           </nav>
@@ -94,6 +94,68 @@ export default function Welcome() {
                 <p>{d}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- THEN / NOW ---------- */}
+      <section className="sec thennow" id="standard">
+        <div className="wrap">
+          <div className="head">
+            <div>
+              <div className="kicker rv">The standard</div>
+              <h2 className="rv">How a car gets called on today. How it gets called on with Overbid.</h2>
+            </div>
+            <p className="lead rv" style={{ "--d": ".1s" }}>Same car, same seller. One is a text to a wholesaler with three photos and a mileage. The other is a bid sheet eighty stores can act on in two hours.</p>
+          </div>
+          <div className="tn-grid">
+            <div className="tn-panel tn-then rv">
+              <div className="tn-label">Today</div>
+              <div className="phone">
+                <div className="phone-bar"><span className="dot" /> Wholesaler</div>
+                <div className="bubble me">2021 RS5 sportback nardo 44k two sets of tires clean car whats your number</div>
+                <div className="bubble me pics">
+                  <img src="/demo/WUABWCF5XMA902427/01.jpg" alt="" /><img src="/demo/WUABWCF5XMA902427/02.jpg" alt="" /><img src="/demo/WUABWCF5XMA902427/04.jpg" alt="" />
+                </div>
+                <div className="bubble them">Let me make a couple calls</div>
+                <div className="bubble them delay">52 and that's strong</div>
+                <div className="phone-ts">2 hours 40 minutes later</div>
+              </div>
+              <ul className="tn-points">
+                <li>One buyer, who shops it to two friends before he answers</li>
+                <li>No comps, no condition detail, no record of the offer</li>
+                <li>The number is whatever he says it is</li>
+              </ul>
+            </div>
+            <div className="tn-panel tn-now rv" style={{ "--d": ".12s" }}>
+              <div className="tn-label on">With Overbid</div>
+              <div className="sheetmock">
+                <div className="sm-band"><img src="/lockup-dark.png" alt="Overbid" /><span>Dealer bid sheet · W-1033</span></div>
+                <div className="sm-title">2021 Audi RS 5 Sportback<small>44,500 km · Nardo Grey · 16 required photos</small></div>
+                <div className="sm-gallery">
+                  {["01","02","03","04","05","06"].map((n) => <img key={n} src={`/demo/WUABWCF5XMA902427/${n}.jpg`} alt="" />)}
+                  <div className="more">+10</div>
+                </div>
+                <div className="sm-tiles">
+                  <div><b>17</b><span>comparable units<br />3 within 1,000 km</span></div>
+                  <div><b>135</b><span>market days supply</span></div>
+                  <div><b>$2,000</b><span>est. recon to retail</span></div>
+                </div>
+                <div className="sm-h">Comparable vehicles · nearest first</div>
+                <div className="sm-row local"><span>2021 · 65,666 km · Go Infiniti South, Calgary</span><b>$63,488</b></div>
+                <div className="sm-row local"><span>2021 · 32,380 km · Genesis South Edmonton</span><b>$67,795</b></div>
+                <div className="sm-row local"><span>2021 · 72,767 km · Kelowna Mazda</span><b>$60,688</b></div>
+                <div className="sm-row"><span>2021 · 47,692 km · Audi Richmond</span><b>$71,997</b></div>
+                <div className="sm-h">What we noted on the car</div>
+                <div className="sm-notes">Two new sets of tires · Audi-only service · never tuned · carbon aero with OEM parts included · rear bumper scuffs below the plate</div>
+                <div className="sm-bid"><span>Your number</span><div className="btn">Place bid</div></div>
+              </div>
+              <ul className="tn-points">
+                <li>Eighty franchise stores, sealed bids, two-hour window</li>
+                <li>Comps, days supply, recon and notes on every unit</li>
+                <li>The seller sees the top five, net, and taps Accept</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
