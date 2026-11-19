@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }) {
       <header className="topbar">
         <div className="inner">
           <Link href="/" className="brand"><Logo size={24} sub={<span className="hide-sm">BY 409 MOTOR CO</span>} /></Link>
-          <Nav />
+          <Nav role={user?.role} />
           <div className="who hide-sm">{user?.name}<a href="/logout">Sign out</a></div>
         </div>
       </header>

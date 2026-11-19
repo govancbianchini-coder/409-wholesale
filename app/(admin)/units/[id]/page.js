@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { q } from "@/lib/db";
+import { currentUser } from "@/lib/util";
 import { unitRows } from "@/lib/stats";
 import { money, km, title, when, ago, int, effectiveStatus, STATUS_LABEL, appUrl, TZ } from "@/lib/util";
 import { spreadFor } from "@/lib/util";
@@ -23,6 +24,7 @@ export default async function Unit({ params, searchParams }) {
   const sp = await searchParams;
   const id = int(raw);
   await sweepClosed();
+  const isAdmin = (await currentUser())?.role === "admin";
   const [v] = await unitRows({ where: "v.id = $1", params: [id] });
   if (!v) notFound();
   const st = effectiveStatus(v);
@@ -220,19 +222,21 @@ export default async function Unit({ params, searchParams }) {
                 <div className="muted">{v.offer_accepted_at && v.submitted_by ? "Seller accepted" : "Awarded"} {when(v.awarded_at)}</div>
                 <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "6px 0" }} />
                 <div><b>Settlement</b> <span className="muted">— tick each step; the right party is notified.</span></div>
-                {SETTLEMENT_STEPS.map(([k, label]) => (
+                {SETTLEMENT_STEPS.map(([k, label]) => isAdmin ? (
                   <form key={k} action={setSettlement} className="row" style={{ gap: 8, alignItems: "center" }}>
                     <input type="hidden" name="id" value={id} /><input type="hidden" name="step" value={k} /><input type="hidden" name="on" value={v[k] ? "0" : "1"} />
                     <button className={`btn sm ${v[k] ? "" : "primary"}`} style={{ minWidth: 28 }}>{v[k] ? "✓" : "○"}</button>
                     <span className={v[k] ? "" : "ink2"}>{label}{v[k] ? <span className="xs muted"> · {when(v[k])}</span> : null}</span>
                   </form>
+                ) : (
+                  <div key={k} className="row" style={{ gap: 8 }}><span>{v[k] ? "✓" : "○"}</span><span className={v[k] ? "" : "ink2"}>{label}</span></div>
                 ))}
                 <hr style={{ border: 0, borderTop: "1px solid var(--line)", margin: "6px 0" }} />
-                <form action={updateDeal} className="stack-sm" style={{ marginTop: 10 }}>
+                {isAdmin && <form action={updateDeal} className="stack-sm" style={{ marginTop: 10 }}>
                   <input type="hidden" name="id" value={id} />
                   <div className="row"><input type="text" inputMode="numeric" name="buy_price" defaultValue={v.buy_price ?? ""} placeholder="Paid to seller" /><input type="text" inputMode="numeric" name="sell_price" defaultValue={v.sell_price ?? ""} placeholder="Sold for" /></div>
                   <button className="btn sm">Update final numbers</button>
-                </form>
+                </form>}
                 <form action={setStatus} style={{ marginTop: 6 }}><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value="live" /><button className="linkbtn small">Undo award (deal fell through)</button></form>
               </div>
             </div>
@@ -255,7 +259,7 @@ export default async function Unit({ params, searchParams }) {
                 <div className="row wrap">
                   {st === "live" && <form action={closeNow}><input type="hidden" name="id" value={id} /><button className="btn sm">Close bidding now</button></form>}
                   {st !== "no_sale" && st !== "draft" && <form action={setStatus}><input type="hidden" name="id" value={id} /><input type="hidden" name="status" value="no_sale" /><button className="btn sm danger">Mark no sale</button></form>}
-                  {st === "draft" && <form action={deleteVehicle}><input type="hidden" name="id" value={id} /><button className="btn sm danger">Delete draft</button></form>}
+                  {st === "draft" && isAdmin && <form action={deleteVehicle}><input type="hidden" name="id" value={id} /><button className="btn sm danger">Delete draft</button></form>}
                 </div>
               </div>
             </div>

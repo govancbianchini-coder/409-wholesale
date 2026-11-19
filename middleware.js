@@ -4,7 +4,7 @@ import { COOKIE, DEALER_COOKIE, verify } from "./lib/session";
 // Public: dealer bid links, unsubscribe, terms, logins, Twilio webhook, report API (does its own auth), static files.
 const PUBLIC = [/^\/b\//, /^\/u\//, /^\/terms/, /^\/login/, /^\/api\/twilio/, /^\/api\/cron\//, /^\/api\/units\/[^/]+\/report$/, /^\/_next/, /^\/uploads\//, /^\/demo\//, /^\/favicon/, /^\/brand/, /^\/mark\.svg$/, /^\/icon\.svg$/, /^\/lockup-(dark|light)\.png$/, /^\/apple-touch-icon\.png$/, /^\/icon-(192|512)\.png$/, /^\/manifest\.webmanifest$/, /^\/welcome/, /^\/fonts\//, /^\/zxing_reader\.wasm$/, /^\/d\/login/, /^\/d\/code/, /^\/d\/join\//, /^\/d\/logout/];
 // Staff (e.g. Kevin) may only use the intake form.
-const STAFF_OK = [/^\/intake/, /^\/logout/, /^\/gtm/, /^\/api\/gtm/];
+const STAFF_OK = [/^\/intake/, /^\/logout/, /^\/gtm/, /^\/api\/gtm/, /^\/units/, /^\/dealers/];
 // Dealer area and the APIs a dealer needs (upload, VIN decode).
 const DEALER_AREA = [/^\/d(\/|$)/, /^\/api\/upload/, /^\/api\/vin/];
 
@@ -38,7 +38,7 @@ export async function middleware(req) {
   }
   if (staff.role === "staff" && !STAFF_OK.some((r) => r.test(pathname))) {
     const url = req.nextUrl.clone();
-    url.pathname = "/gtm";
+    url.pathname = "/units";
     url.search = "";
     return NextResponse.redirect(url);
   }

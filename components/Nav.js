@@ -10,11 +10,11 @@ const LINKS = [
   ["/gtm", "Sign-ups"],
 ];
 
-export default function Nav() {
+export default function Nav({ role }) {
   const p = usePathname();
   return (
     <nav className="nav">
-      {LINKS.map(([href, label]) => {
+      {LINKS.filter(([href]) => role !== "staff" || href !== "/").map(([href, label]) => {
         const on = href === "/" ? p === "/" : p.startsWith(href);
         return (
           <Link key={href} href={href} className={on ? "on" : ""}>
