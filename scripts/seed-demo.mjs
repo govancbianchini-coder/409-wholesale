@@ -45,6 +45,21 @@ try {
       return b.url;
     } catch { return url; }
   }
+  // Retired demo units: removed on deploy if they never went anywhere (no sends, no bids).
+  const retiredFile = path.join(process.cwd(), "data", "demo", "retired.json");
+  if (fs.existsSync(retiredFile)) {
+    let gone = 0;
+    for (const stock of JSON.parse(fs.readFileSync(retiredFile, "utf8"))) {
+      const r = await client.query(
+        `DELETE FROM vehicles v WHERE v.internal_notes = $1 AND v.status IN ('submitted','draft')
+           AND NOT EXISTS (SELECT 1 FROM bids b WHERE b.vehicle_id = v.id)
+           AND NOT EXISTS (SELECT 1 FROM invitations i WHERE i.vehicle_id = v.id AND i.sent_at IS NOT NULL) RETURNING id`,
+        [`demo-stock:${stock}`]
+      );
+      gone += r.rowCount;
+    }
+    if (gone) console.log(`[seed-demo] retired ${gone} demo unit(s).`);
+  }
   let made = 0;
   for (const u of units) {
     const demoKey = `demo-stock:${u.stock || u.vin}`;
