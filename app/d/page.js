@@ -26,7 +26,7 @@ export default async function DealerHome() {
        (SELECT count(*) FROM photos p WHERE p.vehicle_id = v.id AND p.slot IS NOT NULL)::int shots,
        (SELECT count(*) FROM bids b WHERE b.vehicle_id = v.id AND NOT superseded)::int bid_count,
        (SELECT max(amount) FROM bids b WHERE b.vehicle_id = v.id AND NOT superseded) top_bid
-     FROM vehicles v WHERE v.submitted_by = $1 ORDER BY v.created_at DESC LIMIT 20`,
+     FROM vehicles v WHERE v.submitted_by = $1 ORDER BY (v.status IN ('submitted','draft','live')) DESC, v.created_at DESC LIMIT 200`,
     [d.cid]
   );
 
